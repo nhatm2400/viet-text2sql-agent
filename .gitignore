@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Secrets & local config
+.env
+.env.local
+*.pem
+*.key
+
+# Data — external datasets are NEVER committed (license: research/education only)
+data/
+db/*.sqlite
+db/*.db
+
+# Evaluation results — reproduced by `make eval`, never committed
+eval/results/*
+!eval/results/.gitkeep
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

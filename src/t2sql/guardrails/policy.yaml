@@ -1,0 +1,58 @@
+# SQL execution policy. Loaded by src/t2sql/guardrails/ast_policy.py.
+#
+# This file is the written form of the security argument: the agent decides strategy,
+# this file decides policy. Changing it changes what the system is allowed to run —
+# treat edits here as security-relevant changes, not configuration tweaks.
+#
+# Kept in sync with db/roles.sql (allowed_tables == the GRANT SELECT list).
+
+max_rows: 1000                 # hard LIMIT ceiling; larger limits are clamped, missing ones injected
+max_statements: 1              # exactly one statement per execution, always
+max_joins: 6                   # guard against cartesian blow-ups the DB timeout would have to catch
+require_limit: true
+
+allowed_statement_types:
+  - SELECT                     # WITH ... SELECT is allowed; the CTE body is checked too
+
+denied_schemas:
+  - pg_catalog
+  - information_schema
+  - pg_toast
+  - pg_temp
+
+allowed_tables:
+  - regions
+  - customers
+  - addresses
+  - categories
+  - suppliers
+  - products
+  - inventory
+  - orders
+  - order_items
+  - payments
+  - shipments
+  - reviews
+
+# Columns that must never appear in a projection, filter, join or ORDER BY.
+# PII with no analytical value — there is no legitimate question that needs them.
+sensitive_columns:
+  - customers.email
+  - customers.phone
+
+# Functions that read server state, touch the filesystem, or open a network connection.
+denied_functions:
+  - pg_read_file
+  - pg_read_binary_file
+  - pg_ls_dir
+  - pg_sleep
+  - lo_import
+  - lo_export
+  - dblink
+  - dblink_exec
+  - query_to_xml
+  - pg_stat_file
+  - current_setting
+  - set_config
+  - pg_terminate_backend
+  - pg_cancel_backend

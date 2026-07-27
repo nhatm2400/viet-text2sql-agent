@@ -1,0 +1,64 @@
+# viet-text2sql-agent — reverse proxy.
+#
+# Caddy is a single static binary with a systemd unit. No nginx, no container, no sidecar.
+#
+# Routing decision (documented per the scaffold spec): ONE hostname, path-based split.
+#   https://t2sql.example.com/        -> Streamlit UI  (127.0.0.1:8501)
+#   https://t2sql.example.com/api/*   -> FastAPI       (127.0.0.1:8000)
+# One host means one DNS record and one tunnel route instead of two, which matters because the
+# public entry point is a Cloudflare Tunnel: every extra subdomain is another CNAME to keep in
+# sync with the tenten.vn zone. The cost is the /api prefix strip below — an acceptable trade.
+#
+# Both upstreams listen on loopback only (see the systemd units); this file is the only ingress.
+#
+# Replace t2sql.example.com with the real hostname before `systemctl reload caddy`.
+
+{
+	# Automatic HTTPS is handled by Cloudflare at the tunnel edge, so Caddy serves plain HTTP on
+	# loopback and does not try to solve an ACME challenge for a host it cannot be reached on.
+	auto_https off
+	admin off
+}
+
+http://t2sql.example.com, http://localhost {
+
+	encode zstd gzip
+
+	# --- API -----------------------------------------------------------------
+	handle_path /api/* {
+		reverse_proxy 127.0.0.1:8000 {
+			header_up X-Real-IP {remote_host}
+			# The agent loop can legitimately take a while: several model turns plus SQL.
+			transport http {
+				response_header_timeout 120s
+			}
+		}
+	}
+
+	# Health check reachable without the /api prefix, for uptime pings and scripts/keepalive_ping.py
+	handle /health {
+		reverse_proxy 127.0.0.1:8000
+	}
+
+	# --- UI (default) --------------------------------------------------------
+	handle {
+		reverse_proxy 127.0.0.1:8501 {
+			header_up X-Real-IP {remote_host}
+		}
+	}
+
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options SAMEORIGIN
+		Referrer-Policy no-referrer
+		-Server
+	}
+
+	log {
+		output file /var/log/caddy/t2sql.log {
+			roll_size 10MiB
+			roll_keep 5
+		}
+		format console
+	}
+}

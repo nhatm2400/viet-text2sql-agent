@@ -1,0 +1,20 @@
+# A1 — CHANGED FACTOR: model_role (fast -> strong). Everything else identical to baseline.yaml.
+# Hypothesis: model tier is the single largest lever on strict EX. If it is not, that is the
+# result — and it is the one that decides whether the rest of the matrix is worth running.
+name: a1_model_tier
+
+dataset: eval/datasets/core_vi/questions.jsonl
+dataset_version: "0.1.0"
+snapshot: "seed@RNG_SEED=20260727 (2025-01-01..2026-06-30)"
+
+model_role: strong                # <-- THE ONE CHANGE
+context_strategy: full_schema
+example_selection: fixed_3shot
+repair: off
+
+max_iterations: 6
+temperature: 0
+max_tokens: 2048
+run_security_suite: true
+gold_database_url: ""
+as_of_date: "2026-07-27"

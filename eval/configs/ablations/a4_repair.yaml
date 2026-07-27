@@ -1,0 +1,24 @@
+# A4 — CHANGED FACTOR: repair (off -> on, at most one retry after a failed execute_sql).
+# Hypothesis: one bounded repair attempt converts a chunk of execution errors into correct
+# answers. The metric to watch alongside EX is p95 latency: a repair that buys +3 pp of strict EX
+# for +80% latency is a trade-off to report, not a win to claim.
+# Report self_correction_success_rate from this run — its denominator is only the items that
+# actually failed once, and it is undefined (not 0%) when nothing failed.
+name: a4_repair
+
+dataset: eval/datasets/core_vi/questions.jsonl
+dataset_version: "0.1.0"
+snapshot: "seed@RNG_SEED=20260727 (2025-01-01..2026-06-30)"
+
+model_role: fast
+context_strategy: full_schema
+example_selection: fixed_3shot
+repair: on                        # <-- THE ONE CHANGE (max 1 retry)
+max_repairs: 1
+
+max_iterations: 6
+temperature: 0
+max_tokens: 2048
+run_security_suite: true
+gold_database_url: ""
+as_of_date: "2026-07-27"

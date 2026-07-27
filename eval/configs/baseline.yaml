@@ -1,0 +1,31 @@
+# Run B — BASELINE. The reference point every ablation is compared against.
+#
+# Deliberately weak: fast model, full schema in the prompt, a fixed 3-shot example block, no
+# retrieval, no repair. Its job is to be a fair floor, not a good result (proposal §7.1).
+#
+# Held constant across EVERY run in the experiment matrix — changing any of these invalidates
+# the comparison, not just the run:
+#   database snapshot · dataset version · temperature · token limits · prompt scaffold ·
+#   max_iterations
+name: baseline
+
+dataset: eval/datasets/core_vi/questions.jsonl
+dataset_version: "0.1.0"          # bump when questions.jsonl changes; results are keyed to it
+snapshot: "seed@RNG_SEED=20260727 (2025-01-01..2026-06-30)"
+
+# --- the four experiment factors ------------------------------------------
+model_role: fast                  # A1 changes this
+context_strategy: full_schema     # A2 changes this
+example_selection: fixed_3shot    # A3 changes this
+repair: off                       # A4 changes this
+
+# --- held constant ---------------------------------------------------------
+max_iterations: 6
+temperature: 0
+max_tokens: 2048
+run_security_suite: true
+
+# Online runs only. Offline runs replay tests/fixtures/offline_sql.json instead.
+gold_database_url: ""             # defaults to DATABASE_URL when empty
+
+as_of_date: "2026-07-27"          # anchors relative time expressions ("quý trước")

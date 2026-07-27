@@ -1,0 +1,22 @@
+# A3 — CHANGED FACTOR: example_selection (fixed_3shot -> semantic_retrieval).
+# Hypothesis: examples chosen by similarity to the question beat three fixed ones.
+# Leakage guard: retrieved examples must never come from core_vi. If they do, this run measures
+# memorisation and every number in the row is void.
+# Requires phase-2 retrieval; this config does not run until then.
+name: a3_example_selection
+
+dataset: eval/datasets/core_vi/questions.jsonl
+dataset_version: "0.1.0"
+snapshot: "seed@RNG_SEED=20260727 (2025-01-01..2026-06-30)"
+
+model_role: fast
+context_strategy: full_schema
+example_selection: semantic_retrieval   # <-- THE ONE CHANGE
+repair: off
+
+max_iterations: 6
+temperature: 0
+max_tokens: 2048
+run_security_suite: true
+gold_database_url: ""
+as_of_date: "2026-07-27"

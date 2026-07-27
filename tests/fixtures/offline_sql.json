@@ -1,0 +1,275 @@
+{
+  "version": 1,
+  "_readme": [
+    "Recorded result sets for OFFLINE_MODE=1. execute_sql runs the FULL AST policy first and",
+    "only then replaces the database driver with a lookup in this file, so offline runs",
+    "enforce exactly the same policy as online runs.",
+    "Keys are matched on whitespace/case-normalised SQL. Both the raw query and the",
+    "policy-rewritten form (LIMIT injected/clamped) are stored: the agent executes the",
+    "rewritten form, the eval harness executes raw gold SQL.",
+    "Regenerate after changing db/seed.py, db/schema.sql, the gold SQL or the LLM script:",
+    "  python db/seed.py --url sqlite:///data/dev.sqlite   (data/ is git-ignored)",
+    "  then re-run the recording snippet documented in docs/DECISIONS.md",
+    "Snapshot: db/seed.py RNG_SEED=20260727, 2025-01-01..2026-06-30."
+  ],
+  "results": [
+    {
+      "sql": "SELECT c.customer_id, c.full_name, SUM(p.amount) AS revenue FROM payments AS p JOIN orders AS o ON o.order_id = p.order_id JOIN customers AS c ON c.customer_id = o.customer_id WHERE p.status = 'succeeded' AND p.paid_at >= '2026-06-01' AND p.paid_at < '2026-07-01' GROUP BY c.customer_id, c.full_name ORDER BY revenue DESC, c.customer_id ASC LIMIT 5",
+      "columns": [
+        "customer_id",
+        "full_name",
+        "revenue"
+      ],
+      "rows": [
+        {
+          "customer_id": 4102,
+          "full_name": "Bùi Thanh Linh",
+          "revenue": 595388550.83
+        },
+        {
+          "customer_id": 2352,
+          "full_name": "Nguyễn Gia Quân",
+          "revenue": 582329873.88
+        },
+        {
+          "customer_id": 1734,
+          "full_name": "Hoàng Thị Linh",
+          "revenue": 548353503.32
+        },
+        {
+          "customer_id": 4076,
+          "full_name": "Phạm Hữu Hà",
+          "revenue": 525950291.12
+        },
+        {
+          "customer_id": 1702,
+          "full_name": "Lê Văn Phúc",
+          "revenue": 520547950.29
+        }
+      ]
+    },
+    {
+      "sql": "SELECT r.region_name, SUM(p.amount) AS revenue FROM payments AS p JOIN orders AS o ON o.order_id = p.order_id JOIN customers AS c ON c.customer_id = o.customer_id JOIN regions AS r ON r.region_id = c.region_id WHERE p.status = 'succeeded' AND p.paid_at >= '2026-04-01' AND p.paid_at < '2026-07-01' GROUP BY r.region_name ORDER BY revenue DESC",
+      "columns": [
+        "region_name",
+        "revenue"
+      ],
+      "rows": [
+        {
+          "region_name": "Miền Nam",
+          "revenue": 234146338762.16
+        },
+        {
+          "region_name": "Miền Bắc",
+          "revenue": 185870004361.3
+        },
+        {
+          "region_name": "Miền Trung",
+          "revenue": 111093037734.47
+        }
+      ]
+    },
+    {
+      "sql": "SELECT r.region_name, SUM(p.amount) AS revenue FROM payments AS p JOIN orders AS o ON o.order_id = p.order_id JOIN customers AS c ON c.customer_id = o.customer_id JOIN regions AS r ON r.region_id = c.region_id WHERE p.status = 'succeeded' AND p.paid_at >= '2026-04-01' AND p.paid_at < '2026-07-01' GROUP BY r.region_name ORDER BY revenue DESC LIMIT 1000",
+      "columns": [
+        "region_name",
+        "revenue"
+      ],
+      "rows": [
+        {
+          "region_name": "Miền Nam",
+          "revenue": 234146338762.16
+        },
+        {
+          "region_name": "Miền Bắc",
+          "revenue": 185870004361.3
+        },
+        {
+          "region_name": "Miền Trung",
+          "revenue": 111093037734.47
+        }
+      ]
+    },
+    {
+      "sql": "SELECT pr.product_id, pr.product_name, SUM(oi.quantity) AS total_quantity FROM order_items AS oi JOIN orders AS o ON o.order_id = oi.order_id JOIN products AS pr ON pr.product_id = oi.product_id WHERE o.created_at >= '2026-01-01' AND o.created_at < '2027-01-01' AND o.status <> 'cancelled' GROUP BY pr.product_id, pr.product_name ORDER BY total_quantity DESC, pr.product_name ASC LIMIT 10",
+      "columns": [
+        "product_id",
+        "product_name",
+        "total_quantity"
+      ],
+      "rows": [
+        {
+          "product_id": 207,
+          "product_name": "Garden Lite 207",
+          "total_quantity": 377
+        },
+        {
+          "product_id": 243,
+          "product_name": "Toys Classic 243",
+          "total_quantity": 376
+        },
+        {
+          "product_id": 51,
+          "product_name": "Men Pro 51",
+          "total_quantity": 374
+        },
+        {
+          "product_id": 256,
+          "product_name": "Garden Ultra 256",
+          "total_quantity": 369
+        },
+        {
+          "product_id": 222,
+          "product_name": "Automotive Classic 222",
+          "total_quantity": 366
+        },
+        {
+          "product_id": 117,
+          "product_name": "Automotive Air 117",
+          "total_quantity": 362
+        },
+        {
+          "product_id": 151,
+          "product_name": "Kitchen Ultra 151",
+          "total_quantity": 358
+        },
+        {
+          "product_id": 62,
+          "product_name": "Pet Air 62",
+          "total_quantity": 358
+        },
+        {
+          "product_id": 187,
+          "product_name": "Fashion Lite 187",
+          "total_quantity": 357
+        },
+        {
+          "product_id": 144,
+          "product_name": "Kitchen Pro 144",
+          "total_quantity": 356
+        }
+      ]
+    },
+    {
+      "sql": "SELECT COUNT(*) AS customer_count FROM customers AS c JOIN regions AS r ON r.region_id = c.region_id WHERE r.region_code = 'SOUTH' AND c.status = 'active'",
+      "columns": [
+        "customer_count"
+      ],
+      "rows": [
+        {
+          "customer_count": 1686
+        }
+      ]
+    },
+    {
+      "sql": "SELECT COUNT(*) AS customer_count FROM customers AS c JOIN regions AS r ON r.region_id = c.region_id WHERE r.region_code = 'SOUTH' AND c.status = 'active' LIMIT 1000",
+      "columns": [
+        "customer_count"
+      ],
+      "rows": [
+        {
+          "customer_count": 1686
+        }
+      ]
+    },
+    {
+      "sql": "SELECT o.channel, COUNT(*) AS cancelled_orders FROM orders AS o WHERE o.status = 'cancelled' AND o.created_at >= '2026-01-01' AND o.created_at < '2026-07-01' GROUP BY o.channel ORDER BY cancelled_orders DESC, o.channel ASC",
+      "columns": [
+        "channel",
+        "cancelled_orders"
+      ],
+      "rows": [
+        {
+          "channel": "web",
+          "cancelled_orders": 374
+        },
+        {
+          "channel": "app",
+          "cancelled_orders": 359
+        },
+        {
+          "channel": "store",
+          "cancelled_orders": 174
+        },
+        {
+          "channel": "marketplace",
+          "cancelled_orders": 111
+        }
+      ]
+    },
+    {
+      "sql": "SELECT o.channel, COUNT(*) AS cancelled_orders FROM orders AS o WHERE o.status = 'cancelled' AND o.created_at >= '2026-01-01' AND o.created_at < '2026-07-01' GROUP BY o.channel ORDER BY cancelled_orders DESC, o.channel ASC LIMIT 1000",
+      "columns": [
+        "channel",
+        "cancelled_orders"
+      ],
+      "rows": [
+        {
+          "channel": "web",
+          "cancelled_orders": 374
+        },
+        {
+          "channel": "app",
+          "cancelled_orders": 359
+        },
+        {
+          "channel": "store",
+          "cancelled_orders": 174
+        },
+        {
+          "channel": "marketplace",
+          "cancelled_orders": 111
+        }
+      ]
+    },
+    {
+      "sql": "SELECT pr.product_name, SUM(oi.quantity) AS total_quantity FROM order_items AS oi JOIN orders AS o ON o.order_id = oi.order_id JOIN products AS pr ON pr.product_id = oi.product_id WHERE o.created_at >= '2026-01-01' AND o.created_at < '2027-01-01' AND o.status <> 'cancelled' GROUP BY pr.product_name ORDER BY total_quantity DESC, pr.product_name ASC LIMIT 10",
+      "columns": [
+        "product_name",
+        "total_quantity"
+      ],
+      "rows": [
+        {
+          "product_name": "Garden Lite 207",
+          "total_quantity": 377
+        },
+        {
+          "product_name": "Toys Classic 243",
+          "total_quantity": 376
+        },
+        {
+          "product_name": "Men Pro 51",
+          "total_quantity": 374
+        },
+        {
+          "product_name": "Garden Ultra 256",
+          "total_quantity": 369
+        },
+        {
+          "product_name": "Automotive Classic 222",
+          "total_quantity": 366
+        },
+        {
+          "product_name": "Automotive Air 117",
+          "total_quantity": 362
+        },
+        {
+          "product_name": "Kitchen Ultra 151",
+          "total_quantity": 358
+        },
+        {
+          "product_name": "Pet Air 62",
+          "total_quantity": 358
+        },
+        {
+          "product_name": "Fashion Lite 187",
+          "total_quantity": 357
+        },
+        {
+          "product_name": "Kitchen Pro 144",
+          "total_quantity": 356
+        }
+      ]
+    }
+  ]
+}

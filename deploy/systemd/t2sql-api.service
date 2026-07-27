@@ -1,0 +1,45 @@
+[Unit]
+Description=viet-text2sql-agent API (FastAPI/uvicorn)
+Documentation=https://gitlab.com/CHANGEME/viet-text2sql-agent
+After=network-online.target postgresql.service
+Wants=network-online.target
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=t2sql
+Group=t2sql
+WorkingDirectory=/opt/t2sql
+EnvironmentFile=/opt/t2sql/.env
+
+# Bound to loopback on purpose: the only way in is through Caddy (and the Cloudflare Tunnel).
+# There is no open inbound port on this host.
+ExecStart=/opt/t2sql/.venv/bin/uvicorn t2sql.api.main:app \
+    --host 127.0.0.1 \
+    --port 8000 \
+    --workers 2 \
+    --no-access-log
+
+# Process-level resilience — the reviewer-clicks-a-dead-demo risk (proposal §11).
+Restart=on-failure
+RestartSec=5
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+# Hardening. The service reads its checkout and writes nothing outside /tmp.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/t2sql
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=t2sql-api
+
+[Install]
+WantedBy=multi-user.target

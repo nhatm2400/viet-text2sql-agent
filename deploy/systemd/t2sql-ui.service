@@ -1,0 +1,43 @@
+[Unit]
+Description=viet-text2sql-agent UI (Streamlit)
+Documentation=https://gitlab.com/CHANGEME/viet-text2sql-agent
+After=network-online.target t2sql-api.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=t2sql
+Group=t2sql
+WorkingDirectory=/opt/t2sql
+EnvironmentFile=/opt/t2sql/.env
+
+# Loopback only; Caddy is the single ingress. --server.headless keeps Streamlit from trying to
+# open a browser and from printing its onboarding prompt into the journal on every restart.
+ExecStart=/opt/t2sql/.venv/bin/streamlit run /opt/t2sql/ui/streamlit_app.py \
+    --server.address 127.0.0.1 \
+    --server.port 8501 \
+    --server.headless true \
+    --browser.gatherUsageStats false
+
+Restart=on-failure
+RestartSec=5
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+# Streamlit writes its config/cache under the service user's home.
+ReadWritePaths=/opt/t2sql /home/t2sql
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=t2sql-ui
+
+[Install]
+WantedBy=multi-user.target

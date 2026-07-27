@@ -1,0 +1,69 @@
+# Vietnamese business term -> English schema mapping.
+#
+# This file is the contract between "what the business says" and "what the columns mean".
+# It is loaded by src/t2sql/tools/glossary_tools.py and injected into the agent system prompt.
+#
+# Entry shape:
+#   <term>:
+#     aliases:      other spellings the user may type (incl. diacritics-less input)
+#     maps_to:      the tables/columns the term resolves to
+#     sql_fragment: the canonical SQL expression for the term, if it has one
+#     definition:   one-line business definition (Vietnamese ok)
+#     status:       done | todo
+#
+# 3 terms are completed. The remaining 15 are TODO(phase2) and must be authored the same way
+# every eval item is authored: verified against real query results, never guessed.
+
+terms:
+  doanh thu:
+    status: done
+    aliases: ["doanh thu", "doanh so", "doanh số", "revenue", "GMV", "turnover"]
+    maps_to: ["payments.amount", "payments.paid_at", "payments.status"]
+    sql_fragment: "SUM(payments.amount) FILTER (WHERE payments.status = 'succeeded')"
+    definition: >
+      Tiền thực nhận, KHÔNG phải giá trị đơn hàng. Tính trên payments.amount với
+      payments.status = 'succeeded', mốc thời gian là payments.paid_at.
+      Cạm bẫy phổ biến: dùng orders.total_amount + orders.created_at cho ra số cao hơn
+      vì bao gồm cả đơn chưa thanh toán, đơn huỷ và đơn hoàn tiền.
+
+  miền Nam:
+    status: done
+    aliases: ["miền Nam", "mien Nam", "phía Nam", "miền nam", "South", "Sài Gòn", "Saigon", "TP.HCM", "HCM", "Hồ Chí Minh"]
+    maps_to: ["regions.region_code", "regions.region_name", "customers.region_id"]
+    sql_fragment: "regions.region_code = 'SOUTH'"
+    definition: >
+      Vùng địa lý, join qua customers.region_id -> regions.region_id.
+      "Sài Gòn" / "TP.HCM" là THÀNH PHỐ (addresses.city), không đồng nghĩa với cả miền Nam —
+      nếu câu hỏi nói riêng thành phố thì lọc addresses.city = 'TP.HCM', không phải region_code.
+
+  quý trước:
+    status: done
+    aliases: ["quý trước", "quy truoc", "quý vừa rồi", "last quarter", "previous quarter"]
+    maps_to: ["payments.paid_at", "orders.created_at"]
+    sql_fragment: >
+      >= date_trunc('quarter', CURRENT_DATE) - INTERVAL '3 months'
+      AND < date_trunc('quarter', CURRENT_DATE)
+    definition: >
+      Quý dương lịch liền trước quý hiện tại, nửa mở [đầu quý trước, đầu quý này).
+      Neo vào CURRENT_DATE — vì vậy các eval item dùng cụm này phải ghim ngày chạy
+      (xem eval/configs/baseline.yaml -> as_of_date) nếu không kết quả sẽ đổi theo thời gian.
+
+  # ---------------------------------------------------------------------------
+  # TODO(phase2): 15 terms below. Each needs aliases + maps_to + a verified sql_fragment.
+  # Do not ship a guessed mapping — every one of these is a silent-wrong-answer generator.
+  # ---------------------------------------------------------------------------
+  khách hàng active: { status: todo }       # != customers.status='active'; needs a recency window
+  đơn hàng thành công: { status: todo }      # completed vs paid vs delivered — pick one, document it
+  giá trị đơn trung bình: { status: todo }   # AOV: numerator/denominator both need pinning
+  tỷ lệ huỷ đơn: { status: todo }
+  tỷ lệ hoàn hàng: { status: todo }
+  khách hàng mới: { status: todo }           # first-ever order vs created_at in window
+  khách hàng quay lại: { status: todo }
+  từ đầu năm: { status: todo }               # YTD
+  tháng này: { status: todo }
+  cùng kỳ năm ngoái: { status: todo }        # YoY comparison window
+  hàng tồn kho: { status: todo }             # inventory.quantity vs quantity - reserved
+  sắp hết hàng: { status: todo }             # inventory.quantity <= reorder_level
+  miền Bắc: { status: todo }                 # mirror of "miền Nam" -> region_code = 'NORTH'
+  miền Trung: { status: todo }               # -> region_code = 'CENTRAL'
+  chiết khấu: { status: todo }               # orders.discount — gross vs net revenue interaction

@@ -1,0 +1,24 @@
+# A2 — CHANGED FACTOR: context_strategy (full_schema -> hybrid_retrieval).
+# Hypothesis: schema retrieval improves EX. A NEGATIVE RESULT IS EXPECTED AND ACCEPTABLE here:
+# the one piece of direct Vietnamese evidence (OpenReview cWFLrctwuE, desk-rejected, cited with
+# caveats) reports schema filtering UNDERPERFORMING plain few-shot on execution matching
+# (~70.9% vs ~88.2%), and 12 tables is a small haystack. If EX does not move, report the input-
+# token reduction instead — "no accuracy gain, -X% tokens" is a publishable finding.
+# Requires phase-2 retrieval; this config does not run until then.
+name: a2_context_strategy
+
+dataset: eval/datasets/core_vi/questions.jsonl
+dataset_version: "0.1.0"
+snapshot: "seed@RNG_SEED=20260727 (2025-01-01..2026-06-30)"
+
+model_role: fast
+context_strategy: hybrid_retrieval   # <-- THE ONE CHANGE
+example_selection: fixed_3shot
+repair: off
+
+max_iterations: 6
+temperature: 0
+max_tokens: 2048
+run_security_suite: true
+gold_database_url: ""
+as_of_date: "2026-07-27"
