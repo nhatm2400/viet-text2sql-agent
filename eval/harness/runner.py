@@ -13,6 +13,7 @@ not a different code path.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import os
 import sys
@@ -258,7 +259,26 @@ def run_demo(dataset: Path, cap: int) -> int:
 # ---------------------------------------------------------------------------
 
 
+def _force_utf8_output() -> None:
+    """Make stdout/stderr UTF-8 regardless of the terminal's codepage.
+
+    Everything this harness prints — questions, glossary definitions, final answers — is
+    Vietnamese. On Windows, Python picks the console codepage (often cp1252) when stdout is a
+    pipe, and the first accented character raises UnicodeEncodeError, killing the run. The demo
+    is the project's showcase command; it must not crash on the author's own machine because of
+    a locale default. `errors="replace"` guarantees output degrades to '?' rather than aborting.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is not None:
+            # Already detached, or not a real stream (pytest capture, some IDE consoles).
+            with contextlib.suppress(ValueError, OSError):
+                reconfigure(encoding="utf-8", errors="replace")
+
+
 def main(argv: list[str] | None = None) -> int:
+    _force_utf8_output()
+
     parser = argparse.ArgumentParser(description="viet-text2sql evaluation harness")
     parser.add_argument("--config", type=Path, help="run config, e.g. eval/configs/baseline.yaml")
     parser.add_argument("--offline", action="store_true", help="force OFFLINE_MODE=1 (fixtures)")

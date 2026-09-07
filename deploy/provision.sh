@@ -21,7 +21,7 @@ set -euo pipefail
 
 APP_USER="${APP_USER:-t2sql}"
 APP_DIR="${APP_DIR:-/opt/t2sql}"
-REPO_URL="${REPO_URL:-https://gitlab.com/CHANGEME/viet-text2sql-agent.git}"
+REPO_URL="${REPO_URL:-https://github.com/nhatm2400/viet-text2sql-agent.git}"
 PG_VERSION=16
 DB_NAME="${DB_NAME:-t2sql}"
 DB_APP_USER="${DB_APP_USER:-t2sql_app}"

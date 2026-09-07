@@ -7,6 +7,8 @@
 **Author:** MN — AI Engineering, FPT University HCMC
 **Status:** Proposal v1.0 (July 2026). All performance numbers in this document are **placeholders marked TBD** and must never be published before being measured.
 
+> 🇻🇳 A Vietnamese translation is available at [`PROPOSAL.vi.md`](PROPOSAL.vi.md). It also carries an extra section (§14) that walks through the repository folder by folder and file by file — useful for onboarding, and not present in this English original.
+
 ---
 
 ## 1. Problem
@@ -143,7 +145,7 @@ The baseline (B) is deliberately weak by design: zero-shot, full schema, no tool
 **Deployment: fully self-hosted, one VPS, zero containers.**
 
 - **No Docker anywhere** — not on the developer's machine, not in CI, not on the server. This was a deliberate constraint (the author's Windows machine cannot reliably run Docker Desktop — a common blocker on locked-BIOS or WSL2-broken corporate/university laptops), and rather than fight it, the whole stack is designed around plain OS processes instead.
-- **Build/CI pipeline: GitLab CI, deploying over SSH.** Source control and CI live on gitlab.com (free tier, shared runners). Every push runs lint, the offline test suite, and the security suite; on the main branch, a deploy stage SSHes into the VPS, pulls the latest code, updates the Python venv, and restarts two `systemd` services. There is no image to build and no registry — GitLab's runners execute in containers on GitLab's own infrastructure, which the developer never installs, configures, or touches.
+- **Build/CI pipeline: GitHub Actions, deploying over SSH.** Source control and CI live on github.com (free tier). Every push runs lint, the offline test suite, and the security suite; on the main branch, a deploy job SSHes into the VPS, pulls the latest code, updates the Python venv, and restarts two `systemd` services. There is no image to build and no registry. GitHub-hosted runners are **virtual machines, not containers**, so there is no container anywhere in the loop — the developer never installs, configures, or touches Docker. (Revised from the original plan of GitLab CI once the repository landed on GitHub; the pipeline stages are unchanged. See `docs/DECISIONS.md`.)
 - **Local development without Docker or even a local database:** `make test`, `make lint`, and `make smoke` run in a plain Python virtualenv against offline fixtures — no container, no live Postgres, no network. For manual interactive testing, the recommended pattern is an SSH tunnel into a `dev` Postgres database on the VPS (`ssh -L 5432:localhost:5432 user@vps`) rather than installing Postgres+pgvector on Windows, where pgvector requires a native build toolchain and is fragile. The Windows machine only ever needs Python and an editor; if a fully local live-DB workflow is preferred later, developing directly over VS Code Remote-SSH into the VPS is the cleanest option, since Docker was never actually required there either — everything is native services.
 - **Host:** a small VPS running Postgres 16 + pgvector (installed via the PGDG apt repository — `postgresql-16-pgvector` is a prebuilt package, no compilation needed), the FastAPI app under `systemd` (`uvicorn`), the Streamlit UI under its own `systemd` unit, and Caddy as a single-binary reverse proxy with automatic HTTPS.
   - **Recommended: Hetzner CX22** (~€4–5/month, 2 vCPU / 4 GB RAM) — predictable billing, no capacity lottery, no free-tier clawback risk.

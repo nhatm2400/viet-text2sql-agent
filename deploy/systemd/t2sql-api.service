@@ -1,6 +1,6 @@
 [Unit]
 Description=viet-text2sql-agent API (FastAPI/uvicorn)
-Documentation=https://gitlab.com/CHANGEME/viet-text2sql-agent
+Documentation=https://github.com/nhatm2400/viet-text2sql-agent
 After=network-online.target postgresql.service
 Wants=network-online.target
 Requires=postgresql.service

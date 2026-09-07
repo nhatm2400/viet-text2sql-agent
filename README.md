@@ -14,6 +14,10 @@ than by prompt wording.
 Full context: [docs/PROPOSAL.md](docs/PROPOSAL.md) · security model: [docs/SECURITY.md](docs/SECURITY.md) ·
 undocumented choices: [docs/DECISIONS.md](docs/DECISIONS.md).
 
+🇻🇳 **Tiếng Việt:** [docs/PROPOSAL.vi.md](docs/PROPOSAL.vi.md) — bản dịch đề án, **cộng một mục
+hướng dẫn đọc repo giải thích từng thư mục và file đang làm gì**. Nếu bạn mới tiếp cận dự án, bắt
+đầu từ đó (§14).
+
 ---
 
 ## Quickstart
@@ -166,8 +170,9 @@ tempting and what was done instead.
 - [deploy/Caddyfile](deploy/Caddyfile) — `t2sql.<domain>` → UI, `/api/*` → API
 - [deploy/cloudflared/README.md](deploy/cloudflared/README.md) — tunnel setup; the token lives in
   `CLOUDFLARE_TUNNEL_TOKEN` and is never committed
-- CI: [.gitlab-ci.yml](.gitlab-ci.yml) — `lint → test → security → deploy` (SSH, main only; no
-  image build, no registry)
+- CI: [.github/workflows/ci.yml](.github/workflows/ci.yml) — `lint → test → security → deploy`
+  (SSH, main only; no image build, no registry). GitHub-hosted runners are VMs, not containers,
+  so there is no container anywhere in the loop.
 
 Tracing is self-built: every tool call is written to a plain `agent_traces` Postgres table
 ([db/traces.sql](db/traces.sql)) and read back by the Streamlit "Traces" tab. Langfuse **Cloud**

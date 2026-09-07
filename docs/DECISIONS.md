@@ -24,16 +24,24 @@ been the reflex:
    Redis + MinIO). Replicating it under systemd is disproportionate. Tracing writes to a plain
    `agent_traces` table in the same Postgres; Langfuse **Cloud** is optional enrichment.
 
-`.gitlab-ci.yml` fails the lint stage on container tooling that is actually **used**: it looks for
+`.github/workflows/ci.yml` fails the lint job on container tooling that is actually **used**: it looks for
 artefacts (`Dockerfile*`, `docker-compose*.yml`, `.devcontainer`, `.dockerignore`) and for
 invocations (`docker run|build|compose|…`, `kubectl `, `helm install|upgrade|template`). It
 deliberately does **not** grep for the bare word — the first version did, and it failed on the
 comments explaining the constraint, including its own. A check that fires on prose about a rule
 rather than on violations of it teaches people to disable the check.
 
-**GitLab's shared runners execute jobs inside containers on GitLab's infrastructure.** This is
-judged orthogonal: the constraint is about the developer's machine and the deploy target, and the
-developer never installs, configures or touches Docker. Called out here rather than glossed over.
+**CI moved from GitLab CI to GitHub Actions** once the repository actually landed on GitHub
+(`github.com/nhatm2400/viet-text2sql-agent`). The pipeline stages are unchanged
+(`lint → test → security → deploy`); only the syntax and the secret names differ. This was not a
+preference — a `.gitlab-ci.yml` on a GitHub remote simply never runs, which would have made the
+proposal's claim that "the security suite runs as a distinct CI job" **false in practice**. The
+proposal and both README languages were corrected rather than left aspirational.
+
+One incidental improvement: **GitHub-hosted runners are virtual machines, not containers**, so
+the honest caveat the GitLab version needed — that GitLab's shared runners execute jobs inside
+containers on GitLab's infrastructure — no longer applies. There is now no container anywhere in
+the loop, not even one owned by someone else.
 
 ---
 
