@@ -99,6 +99,8 @@ def build_agent(
     max_iterations: int | None = None,
     model_role: str = "fast",
     tools: list[BaseTool] | None = None,
+    model: Any | None = None,
+    prompt_text: str | None = None,
 ) -> Any:
     """Compile the agent graph. `max_iterations` defaults to the configured cap."""
     settings = get_settings()
@@ -107,9 +109,9 @@ def build_agent(
         raise ValueError("max_iterations must be >= 1")
 
     active_tools = [_traced(t) for t in (tools or TOOLS)]
-    model = get_model(model_role).bind_tools(active_tools)
+    model = (model if model is not None else get_model(model_role)).bind_tools(active_tools)
     tool_executor = ToolNode(active_tools)
-    prompt = SystemMessage(content=system_prompt(cap))
+    prompt = SystemMessage(content=prompt_text or system_prompt(cap))
 
     def agent_node(state: AgentState) -> dict[str, Any]:
         response = model.invoke([prompt, *state["messages"]])
@@ -199,10 +201,16 @@ def summarise(state: AgentState, cap: int) -> dict[str, Any]:
         "iterations": state.get("iteration_count", 0),
         "blocked_reasons": [],
     }
+    model_messages = [m for m in messages if isinstance(m, AIMessage)]
+    usage = [m.usage_metadata for m in model_messages]
+    result["model_calls"] = len(model_messages)
+    result["tokens"] = sum(u["total_tokens"] for u in usage) if usage and all(usage) else None
 
     for call in calls:
         payload = call["result"]
         if call["name"] == "execute_sql":
+            # A later failed query must not inherit an earlier query's rows or status.
+            result.update(rows=[], columns=[], chart_spec=None, blocked_reasons=[], status="error")
             result["sql"] = payload.get("data", {}).get("executed_sql") or call["arguments"].get(
                 "sql"
             )

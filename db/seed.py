@@ -134,9 +134,11 @@ def _split_statements(sql: str, dialect: str) -> list[str]:
     return sqlglot.transpile(sql, read="postgres", write=dialect, pretty=False)
 
 
-def build_rows() -> dict[str, list[dict]]:
-    """Generate every table's rows in memory. Pure function of RNG_SEED."""
-    rng = random.Random(RNG_SEED)
+def build_rows(rng_seed: int = RNG_SEED, *, version: str = "v1") -> dict[str, list[dict]]:
+    """Generate rows deterministically; alternate seeds support snapshot validation."""
+    if version not in {"v1", "v2"}:
+        raise ValueError("snapshot version must be v1 or v2")
+    rng = random.Random(rng_seed)
     rows: dict[str, list[dict]] = {}
 
     rows["regions"] = [
@@ -350,7 +352,43 @@ def build_rows() -> dict[str, list[dict]]:
         )
     rows["reviews"] = reviews
 
+    if version == "v2":
+        _repair_v2(rows)
     return rows
+
+
+def _repair_v2(rows: dict[str, list[dict]]) -> None:
+    """Versioned business-consistency repair; v1 replay data is never changed."""
+    orders = {o["order_id"]: o for o in rows["orders"]}
+    products = {p["product_id"]: p for p in rows["products"]}
+    addresses = {a["customer_id"]: a["address_id"] for a in rows["addresses"] if a["is_default"]}
+    payments = {p["order_id"]: p for p in rows["payments"]}
+    for shipment in rows["shipments"]:
+        order = orders[shipment["order_id"]]
+        shipment["address_id"] = addresses[order["customer_id"]]
+        shipment["shipped_at"] = max(shipment["shipped_at"], payments[order["order_id"]]["paid_at"])
+        if shipment["status"] == "delivered":
+            delivered = max(shipment["shipped_at"], shipment["delivered_at"])
+            shipment["delivered_at"] = delivered
+            order["completed_at"] = delivered
+    for item in rows["order_items"]:
+        product = products[item["product_id"]]
+        product["created_at"] = min(product["created_at"], orders[item["order_id"]]["created_at"])
+    completed_purchases = {}
+    for item in rows["order_items"]:
+        order = orders[item["order_id"]]
+        if order["status"] == "completed":
+            key = (order["customer_id"], item["product_id"])
+            completed_purchases[key] = min(
+                completed_purchases.get(key, SNAPSHOT_END), order["completed_at"]
+            )
+    verified_reviews = []
+    for review in rows["reviews"]:
+        purchased = completed_purchases.get((review["customer_id"], review["product_id"]))
+        if purchased is not None:
+            review["created_at"] = min(SNAPSHOT_END, max(purchased, review["created_at"]))
+            verified_reviews.append(review)
+    rows["reviews"] = verified_reviews
 
 
 def seed(url: str, *, drop: bool = True) -> dict[str, int]:

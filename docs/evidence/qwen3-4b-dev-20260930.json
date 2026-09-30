@@ -1,0 +1,1019 @@
+{
+  "label": "provisional-AI-authored-dev",
+  "run": "eval/results/20260929-180317-358297-live-local-dev",
+  "model": "qwen3:4b",
+  "model_digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+  "api_version": {
+    "version": "0.34.4"
+  },
+  "model_options": {
+    "temperature": 0,
+    "num_ctx": 8192,
+    "num_predict": 2048,
+    "seed": 42,
+    "think": true
+  },
+  "snapshot": {
+    "version": "benchmark-v2-candidate-3",
+    "snapshot_version": "v2",
+    "rng_seed": 20260727,
+    "snapshot_sha256": "bb4f8c9127389527e9905622979db6c35b6b6ace91ee40c5ef5b31ee74b89e70",
+    "diagnostics": {
+      "foreign_key_violations": 0,
+      "shipment_address_customer_mismatch": 0,
+      "delivery_before_shipping": 0,
+      "review_after_snapshot_end": 0
+    },
+    "counts": {
+      "regions": 3,
+      "categories": 20,
+      "suppliers": 40,
+      "customers": 5000,
+      "addresses": 6028,
+      "products": 300,
+      "inventory": 613,
+      "orders": 20000,
+      "order_items": 49792,
+      "payments": 17629,
+      "shipments": 13279,
+      "reviews": 4643
+    },
+    "validation_errors": [],
+    "state": "pending_human_review",
+    "dialect": "SQLite native SQL; PostgreSQL model accuracy not evaluated",
+    "source_sha256": {
+      "db/seed.py": "0976303c82c6ff2c0592fb7ac8080fb2fb7160cbce88434c76298844c9e6751f",
+      "db/schema.sql": "a5e4834496334dd7a214636911b18d1fec6b73c133d34573fbf80d8327a173f0",
+      "eval/datasets/review_v2.py": "5c53ed10f71221c964cb0a726a181e0f14fa596798251fae9e8273b915b61f51",
+      "eval/datasets/local_dev/cases.py": "b606fc1cce1b86195221a703465aef86f70033a82e0fa97454c9350c135c95dc"
+    }
+  },
+  "questions_sha256": "2695b833253463aa59faf5d33585b0dccd7dcfca4d9727c2b18b54b1fb8a8ecc",
+  "source_sha256": {
+    "eval/harness/live_local.py": "be3bded233023b780c83b48386983a83ad540ff28e43ca154f1d8fb774ef37e4",
+    "src/t2sql/llm/ollama_local.py": "7a5c0be2aec79177993b6040823e65acc764e713bfedfd4f266f1c6d5552e529",
+    "src/t2sql/agent/build.py": "a9b1a36d120c82bfa057d8d132a4edb45f488ab4944978aa7c5f26b6897e0ce2",
+    "eval/harness/scoring.py": "22855f130d1ea5a842649f454483678973d06b8c44f6e98cacf11bc083e3c482"
+  },
+  "raw_file_sha256": {
+    "summary": "66d719a3816fefe799285683ec1f0b739896c92682e8270f095a78ebb417054f",
+    "config": "715ee44f343711f3f054db1f2a1d69849ef6baa0c408aab7b16d657efe04d830",
+    "items": "531ebe317734f7f644ab87f98d5b72dbad81e05c3bc43cdc4d9db56f547686b4"
+  },
+  "summary": {
+    "baseline": {
+      "n": 20,
+      "strict_correct": 12,
+      "relaxed_correct": 12,
+      "strict_ex": 60.0,
+      "relaxed_ex": 60.0,
+      "p50_ms": 29291.56,
+      "p95_ms": 39165.88,
+      "avg_tokens": 2396.0
+    },
+    "agent": {
+      "n": 20,
+      "strict_correct": 12,
+      "relaxed_correct": 12,
+      "strict_ex": 60.0,
+      "relaxed_ex": 60.0,
+      "p50_ms": 38789.62,
+      "p95_ms": 40222.99,
+      "avg_tokens": 3536.7
+    }
+  },
+  "items": [
+    {
+      "id": "active_customers_north",
+      "variant": "baseline",
+      "strict": true,
+      "relaxed": true,
+      "status": "ok",
+      "latency_ms": 17647.17,
+      "tokens": 1813,
+      "model_calls": 1,
+      "done_reasons": [
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(*) FROM customers JOIN regions ON customers.region_id = regions.region_id WHERE regions.region_code = 'NORTH' AND customers.status = 'active' LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(*)"
+          ],
+          "rows": [
+            [
+              1354
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "active_customers_north",
+      "variant": "agent",
+      "strict": true,
+      "relaxed": true,
+      "status": "executed",
+      "latency_ms": 23505.94,
+      "tokens": 3432,
+      "model_calls": 2,
+      "done_reasons": [
+        "stop",
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(*) FROM customers JOIN regions ON customers.region_id = regions.region_id WHERE regions.region_code = 'NORTH' AND customers.status = 'active' LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(*)"
+          ],
+          "rows": [
+            [
+              1354
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "active_customers_central",
+      "variant": "agent",
+      "strict": true,
+      "relaxed": true,
+      "status": "executed",
+      "latency_ms": 27975.96,
+      "tokens": 3662,
+      "model_calls": 2,
+      "done_reasons": [
+        "stop",
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(*) FROM customers JOIN regions ON customers.region_id = regions.region_id WHERE regions.region_code = 'CENTRAL' AND customers.status = 'active' LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(*)"
+          ],
+          "rows": [
+            [
+              744
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "active_customers_central",
+      "variant": "baseline",
+      "strict": true,
+      "relaxed": true,
+      "status": "ok",
+      "latency_ms": 20752.17,
+      "tokens": 1979,
+      "model_calls": 1,
+      "done_reasons": [
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(*) FROM customers JOIN regions ON customers.region_id = regions.region_id WHERE regions.region_code = 'CENTRAL' AND customers.status = 'active' LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(*)"
+          ],
+          "rows": [
+            [
+              744
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cancelled_orders_north",
+      "variant": "baseline",
+      "strict": false,
+      "relaxed": false,
+      "status": "blocked",
+      "latency_ms": 38673.19,
+      "tokens": 2914,
+      "model_calls": 1,
+      "done_reasons": [
+        "length"
+      ],
+      "attempts": [
+        {
+          "sql": "",
+          "status": "blocked",
+          "message": "empty SQL"
+        }
+      ]
+    },
+    {
+      "id": "cancelled_orders_north",
+      "variant": "agent",
+      "strict": false,
+      "relaxed": false,
+      "status": "error",
+      "latency_ms": 38935.07,
+      "tokens": 3072,
+      "model_calls": 1,
+      "done_reasons": [
+        "length"
+      ],
+      "attempts": []
+    },
+    {
+      "id": "cancelled_orders_central",
+      "variant": "agent",
+      "strict": false,
+      "relaxed": false,
+      "status": "error",
+      "latency_ms": 38927.22,
+      "tokens": 3073,
+      "model_calls": 1,
+      "done_reasons": [
+        "length"
+      ],
+      "attempts": []
+    },
+    {
+      "id": "cancelled_orders_central",
+      "variant": "baseline",
+      "strict": false,
+      "relaxed": false,
+      "status": "blocked",
+      "latency_ms": 38547.06,
+      "tokens": 2915,
+      "model_calls": 1,
+      "done_reasons": [
+        "length"
+      ],
+      "attempts": [
+        {
+          "sql": "",
+          "status": "blocked",
+          "message": "empty SQL"
+        }
+      ]
+    },
+    {
+      "id": "revenue_q2_north",
+      "variant": "baseline",
+      "strict": false,
+      "relaxed": false,
+      "status": "blocked",
+      "latency_ms": 38663.22,
+      "tokens": 2916,
+      "model_calls": 1,
+      "done_reasons": [
+        "length"
+      ],
+      "attempts": [
+        {
+          "sql": "",
+          "status": "blocked",
+          "message": "empty SQL"
+        }
+      ]
+    },
+    {
+      "id": "revenue_q2_north",
+      "variant": "agent",
+      "strict": false,
+      "relaxed": false,
+      "status": "error",
+      "latency_ms": 39571.93,
+      "tokens": 3074,
+      "model_calls": 1,
+      "done_reasons": [
+        "length"
+      ],
+      "attempts": []
+    },
+    {
+      "id": "revenue_q2_central",
+      "variant": "agent",
+      "strict": false,
+      "relaxed": false,
+      "status": "error",
+      "latency_ms": 38789.62,
+      "tokens": 3075,
+      "model_calls": 1,
+      "done_reasons": [
+        "length"
+      ],
+      "attempts": []
+    },
+    {
+      "id": "revenue_q2_central",
+      "variant": "baseline",
+      "strict": false,
+      "relaxed": false,
+      "status": "blocked",
+      "latency_ms": 39342.08,
+      "tokens": 2917,
+      "model_calls": 1,
+      "done_reasons": [
+        "length"
+      ],
+      "attempts": [
+        {
+          "sql": "",
+          "status": "blocked",
+          "message": "empty SQL"
+        }
+      ]
+    },
+    {
+      "id": "units_2026_north",
+      "variant": "baseline",
+      "strict": false,
+      "relaxed": false,
+      "status": "blocked",
+      "latency_ms": 38429.16,
+      "tokens": 2908,
+      "model_calls": 1,
+      "done_reasons": [
+        "length"
+      ],
+      "attempts": [
+        {
+          "sql": "",
+          "status": "blocked",
+          "message": "empty SQL"
+        }
+      ]
+    },
+    {
+      "id": "units_2026_north",
+      "variant": "agent",
+      "strict": false,
+      "relaxed": false,
+      "status": "error",
+      "latency_ms": 39952.83,
+      "tokens": 3066,
+      "model_calls": 1,
+      "done_reasons": [
+        "length"
+      ],
+      "attempts": []
+    },
+    {
+      "id": "units_2026_central",
+      "variant": "agent",
+      "strict": false,
+      "relaxed": false,
+      "status": "error",
+      "latency_ms": 38804.49,
+      "tokens": 3067,
+      "model_calls": 1,
+      "done_reasons": [
+        "length"
+      ],
+      "attempts": []
+    },
+    {
+      "id": "units_2026_central",
+      "variant": "baseline",
+      "strict": false,
+      "relaxed": false,
+      "status": "blocked",
+      "latency_ms": 39165.88,
+      "tokens": 2909,
+      "model_calls": 1,
+      "done_reasons": [
+        "length"
+      ],
+      "attempts": [
+        {
+          "sql": "",
+          "status": "blocked",
+          "message": "empty SQL"
+        }
+      ]
+    },
+    {
+      "id": "low_stock_north",
+      "variant": "baseline",
+      "strict": true,
+      "relaxed": true,
+      "status": "ok",
+      "latency_ms": 30478.56,
+      "tokens": 2437,
+      "model_calls": 1,
+      "done_reasons": [
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(*) FROM inventory JOIN products ON inventory.product_id = products.product_id JOIN suppliers ON products.supplier_id = suppliers.supplier_id JOIN regions ON suppliers.region_id = regions.region_id WHERE inventory.quantity <= inventory.reorder_level AND regions.region_code = 'NORTH' LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(*)"
+          ],
+          "rows": [
+            [
+              17
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "low_stock_north",
+      "variant": "agent",
+      "strict": true,
+      "relaxed": true,
+      "status": "executed",
+      "latency_ms": 24376.68,
+      "tokens": 3487,
+      "model_calls": 2,
+      "done_reasons": [
+        "stop",
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(*) FROM inventory JOIN products ON inventory.product_id = products.product_id JOIN suppliers ON products.supplier_id = suppliers.supplier_id JOIN regions ON suppliers.region_id = regions.region_id WHERE regions.region_code = 'NORTH' AND inventory.quantity <= inventory.reorder_level LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(*)"
+          ],
+          "rows": [
+            [
+              17
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "low_stock_central",
+      "variant": "agent",
+      "strict": true,
+      "relaxed": true,
+      "status": "executed",
+      "latency_ms": 35669.26,
+      "tokens": 4138,
+      "model_calls": 2,
+      "done_reasons": [
+        "stop",
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(*) FROM inventory JOIN products ON inventory.product_id = products.product_id JOIN suppliers ON products.supplier_id = suppliers.supplier_id JOIN regions ON suppliers.region_id = regions.region_id WHERE regions.region_code = 'CENTRAL' AND inventory.quantity <= inventory.reorder_level LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(*)"
+          ],
+          "rows": [
+            [
+              11
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "low_stock_central",
+      "variant": "baseline",
+      "strict": true,
+      "relaxed": true,
+      "status": "ok",
+      "latency_ms": 33639.25,
+      "tokens": 2665,
+      "model_calls": 1,
+      "done_reasons": [
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(*) FROM inventory JOIN products ON inventory.product_id = products.product_id JOIN suppliers ON products.supplier_id = suppliers.supplier_id JOIN regions ON suppliers.region_id = regions.region_id WHERE inventory.quantity <= inventory.reorder_level AND regions.region_code = 'CENTRAL' LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(*)"
+          ],
+          "rows": [
+            [
+              11
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "active_products_north",
+      "variant": "baseline",
+      "strict": true,
+      "relaxed": true,
+      "status": "ok",
+      "latency_ms": 21857.54,
+      "tokens": 2030,
+      "model_calls": 1,
+      "done_reasons": [
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(products.product_id) FROM products JOIN suppliers ON products.supplier_id = suppliers.supplier_id JOIN regions ON suppliers.region_id = regions.region_id WHERE regions.region_code = 'NORTH' AND products.is_active = TRUE LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(products.product_id)"
+          ],
+          "rows": [
+            [
+              112
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "active_products_north",
+      "variant": "agent",
+      "strict": true,
+      "relaxed": true,
+      "status": "executed",
+      "latency_ms": 39821.37,
+      "tokens": 4336,
+      "model_calls": 2,
+      "done_reasons": [
+        "stop",
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(products.product_id) FROM products JOIN suppliers ON products.supplier_id = suppliers.supplier_id JOIN regions ON suppliers.region_id = regions.region_id WHERE products.is_active = TRUE AND regions.region_code = 'NORTH' LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(products.product_id)"
+          ],
+          "rows": [
+            [
+              112
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "active_products_central",
+      "variant": "agent",
+      "strict": true,
+      "relaxed": true,
+      "status": "executed",
+      "latency_ms": 40222.99,
+      "tokens": 4360,
+      "model_calls": 2,
+      "done_reasons": [
+        "stop",
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(products.product_id) FROM products JOIN suppliers ON products.supplier_id = suppliers.supplier_id JOIN regions ON suppliers.region_id = regions.region_id WHERE regions.region_code = 'CENTRAL' AND products.is_active = TRUE LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(products.product_id)"
+          ],
+          "rows": [
+            [
+              90
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "active_products_central",
+      "variant": "baseline",
+      "strict": true,
+      "relaxed": true,
+      "status": "ok",
+      "latency_ms": 25191.76,
+      "tokens": 2229,
+      "model_calls": 1,
+      "done_reasons": [
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(products.product_id) FROM products JOIN suppliers ON products.supplier_id = suppliers.supplier_id JOIN regions ON suppliers.region_id = regions.region_id WHERE regions.region_code = 'CENTRAL' AND products.is_active = TRUE LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(products.product_id)"
+          ],
+          "rows": [
+            [
+              90
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "delivered_shipments_north",
+      "variant": "baseline",
+      "strict": true,
+      "relaxed": true,
+      "status": "ok",
+      "latency_ms": 29291.56,
+      "tokens": 2424,
+      "model_calls": 1,
+      "done_reasons": [
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(ships.shipment_id) FROM shipments AS ships JOIN orders AS orders ON ships.order_id = orders.order_id JOIN customers AS customers ON orders.customer_id = customers.customer_id JOIN regions AS regions ON customers.region_id = regions.region_id WHERE regions.region_code = 'NORTH' AND ships.status = 'delivered' LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(ships.shipment_id)"
+          ],
+          "rows": [
+            [
+              3909
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "delivered_shipments_north",
+      "variant": "agent",
+      "strict": true,
+      "relaxed": true,
+      "status": "executed",
+      "latency_ms": 35953.64,
+      "tokens": 4161,
+      "model_calls": 2,
+      "done_reasons": [
+        "stop",
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(ships.shipment_id) FROM shipments AS ships JOIN orders ON ships.order_id = orders.order_id JOIN customers ON orders.customer_id = customers.customer_id JOIN regions ON customers.region_id = regions.region_id WHERE regions.region_code = 'NORTH' AND ships.status = 'delivered' LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(ships.shipment_id)"
+          ],
+          "rows": [
+            [
+              3909
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "delivered_shipments_central",
+      "variant": "agent",
+      "strict": true,
+      "relaxed": true,
+      "status": "executed",
+      "latency_ms": 44677.39,
+      "tokens": 4596,
+      "model_calls": 2,
+      "done_reasons": [
+        "stop",
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(*) FROM shipments JOIN addresses ON shipments.address_id = addresses.address_id JOIN customers ON addresses.customer_id = customers.customer_id JOIN regions ON customers.region_id = regions.region_id WHERE shipments.status = 'delivered' AND regions.region_code = 'CENTRAL' LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(*)"
+          ],
+          "rows": [
+            [
+              2221
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "delivered_shipments_central",
+      "variant": "baseline",
+      "strict": true,
+      "relaxed": true,
+      "status": "ok",
+      "latency_ms": 20307.48,
+      "tokens": 1964,
+      "model_calls": 1,
+      "done_reasons": [
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(*) FROM shipments JOIN orders ON shipments.order_id = orders.order_id JOIN customers ON orders.customer_id = customers.customer_id JOIN regions ON customers.region_id = regions.region_id WHERE shipments.status = 'delivered' AND regions.region_code = 'CENTRAL' LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(*)"
+          ],
+          "rows": [
+            [
+              2221
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "positive_reviews_north",
+      "variant": "baseline",
+      "strict": true,
+      "relaxed": true,
+      "status": "ok",
+      "latency_ms": 14132.55,
+      "tokens": 1626,
+      "model_calls": 1,
+      "done_reasons": [
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(*) FROM reviews JOIN customers ON reviews.customer_id = customers.customer_id JOIN regions ON customers.region_id = regions.region_id WHERE regions.region_code = 'NORTH' AND reviews.rating >= 4 LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(*)"
+          ],
+          "rows": [
+            [
+              1123
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "positive_reviews_north",
+      "variant": "agent",
+      "strict": true,
+      "relaxed": true,
+      "status": "executed",
+      "latency_ms": 24350.72,
+      "tokens": 3514,
+      "model_calls": 2,
+      "done_reasons": [
+        "stop",
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(*) FROM reviews JOIN customers ON reviews.customer_id = customers.customer_id JOIN regions ON customers.region_id = regions.region_id WHERE regions.region_code = 'NORTH' AND reviews.rating >= 4 LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(*)"
+          ],
+          "rows": [
+            [
+              1123
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "positive_reviews_central",
+      "variant": "agent",
+      "strict": true,
+      "relaxed": true,
+      "status": "executed",
+      "latency_ms": 23897.86,
+      "tokens": 3502,
+      "model_calls": 2,
+      "done_reasons": [
+        "stop",
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(*) FROM reviews JOIN customers ON reviews.customer_id = customers.customer_id JOIN regions ON customers.region_id = regions.region_id WHERE regions.region_code = 'CENTRAL' AND reviews.rating >= 4 LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(*)"
+          ],
+          "rows": [
+            [
+              685
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "positive_reviews_central",
+      "variant": "baseline",
+      "strict": true,
+      "relaxed": true,
+      "status": "ok",
+      "latency_ms": 15686.06,
+      "tokens": 1716,
+      "model_calls": 1,
+      "done_reasons": [
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(*) FROM reviews JOIN customers ON reviews.customer_id = customers.customer_id JOIN regions ON customers.region_id = regions.region_id WHERE regions.region_code = 'CENTRAL' AND reviews.rating >= 4 LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(*)"
+          ],
+          "rows": [
+            [
+              685
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "default_addresses_north",
+      "variant": "baseline",
+      "strict": true,
+      "relaxed": true,
+      "status": "ok",
+      "latency_ms": 20961.7,
+      "tokens": 1977,
+      "model_calls": 1,
+      "done_reasons": [
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(*) FROM addresses JOIN regions ON addresses.region_id = regions.region_id WHERE regions.region_code = 'NORTH' AND addresses.is_default = TRUE LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(*)"
+          ],
+          "rows": [
+            [
+              1799
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "default_addresses_north",
+      "variant": "agent",
+      "strict": true,
+      "relaxed": true,
+      "status": "executed",
+      "latency_ms": 22811.64,
+      "tokens": 3391,
+      "model_calls": 2,
+      "done_reasons": [
+        "stop",
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(*) FROM addresses JOIN regions ON addresses.region_id = regions.region_id WHERE regions.region_code = 'NORTH' AND addresses.is_default = TRUE LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(*)"
+          ],
+          "rows": [
+            [
+              1799
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "default_addresses_central",
+      "variant": "agent",
+      "strict": true,
+      "relaxed": true,
+      "status": "executed",
+      "latency_ms": 26704.94,
+      "tokens": 3599,
+      "model_calls": 2,
+      "done_reasons": [
+        "stop",
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(*) FROM addresses JOIN regions ON addresses.region_id = regions.region_id WHERE regions.region_code = 'CENTRAL' AND addresses.is_default = TRUE LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(*)"
+          ],
+          "rows": [
+            [
+              990
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "default_addresses_central",
+      "variant": "baseline",
+      "strict": true,
+      "relaxed": true,
+      "status": "ok",
+      "latency_ms": 16777.42,
+      "tokens": 1768,
+      "model_calls": 1,
+      "done_reasons": [
+        "stop"
+      ],
+      "attempts": [
+        {
+          "sql": "SELECT COUNT(*) FROM addresses JOIN regions ON addresses.region_id = regions.region_id WHERE regions.region_code = 'CENTRAL' AND addresses.is_default = TRUE LIMIT 1000",
+          "status": "ok",
+          "columns": [
+            "COUNT(*)"
+          ],
+          "rows": [
+            [
+              990
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sold_categories_north",
+      "variant": "baseline",
+      "strict": false,
+      "relaxed": false,
+      "status": "blocked",
+      "latency_ms": 38453.67,
+      "tokens": 2906,
+      "model_calls": 1,
+      "done_reasons": [
+        "length"
+      ],
+      "attempts": [
+        {
+          "sql": "",
+          "status": "blocked",
+          "message": "empty SQL"
+        }
+      ]
+    },
+    {
+      "id": "sold_categories_north",
+      "variant": "agent",
+      "strict": false,
+      "relaxed": false,
+      "status": "error",
+      "latency_ms": 40005.13,
+      "tokens": 3064,
+      "model_calls": 1,
+      "done_reasons": [
+        "length"
+      ],
+      "attempts": []
+    },
+    {
+      "id": "sold_categories_central",
+      "variant": "agent",
+      "strict": false,
+      "relaxed": false,
+      "status": "error",
+      "latency_ms": 38840.57,
+      "tokens": 3065,
+      "model_calls": 1,
+      "done_reasons": [
+        "length"
+      ],
+      "attempts": []
+    },
+    {
+      "id": "sold_categories_central",
+      "variant": "baseline",
+      "strict": false,
+      "relaxed": false,
+      "status": "blocked",
+      "latency_ms": 38661.25,
+      "tokens": 2907,
+      "model_calls": 1,
+      "done_reasons": [
+        "length"
+      ],
+      "attempts": [
+        {
+          "sql": "",
+          "status": "blocked",
+          "message": "empty SQL"
+        }
+      ]
+    }
+  ]
+}

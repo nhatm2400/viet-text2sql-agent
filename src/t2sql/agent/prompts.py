@@ -14,6 +14,16 @@ from __future__ import annotations
 from t2sql.tools.glossary_tools import glossary_block
 from t2sql.tools.schema_tools import schema_block
 
+CALENDAR_WINDOW_RULES = (
+    "\nCalendar date windows:\n"
+    "For date-based calendar windows on timestamp columns, use half-open bounds: "
+    "timestamp_column >= start AND timestamp_column < exclusive_end. "
+    "The exclusive end is the start of the next requested calendar period, or the day "
+    "after an inclusive final date. An inclusive upper comparison to a bare date ends "
+    "at midnight and omits later timestamps on that final day. "
+    "Preserve explicitly requested exact-time comparisons and duration thresholds."
+)
+
 SYSTEM_TEMPLATE = """\
 You are a careful data analyst for a Vietnamese e-commerce company. Users ask questions in \
 Vietnamese or English; the database schema is in English. You answer by querying the database \
@@ -66,13 +76,14 @@ re-checking things you already know.\
 """
 
 
-def system_prompt(max_iterations: int = 6) -> str:
+def system_prompt(max_iterations: int = 6, *, date_windows: bool = True) -> str:
     """Render the system prompt. Schema and glossary are read from the repo, never hardcoded."""
-    return SYSTEM_TEMPLATE.format(
+    rendered = SYSTEM_TEMPLATE.format(
         schema=schema_block(),
         glossary=glossary_block() or "(no verified terms yet)",
         max_iterations=max_iterations,
     )
+    return rendered + CALENDAR_WINDOW_RULES if date_windows else rendered
 
 
 EXHAUSTED_MESSAGE = (

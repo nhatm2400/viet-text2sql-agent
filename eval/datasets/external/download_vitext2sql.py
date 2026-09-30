@@ -1,7 +1,6 @@
 """Download the ViText2SQL evaluation subset into the git-ignored `data/external/` directory.
 
-STUB — not implemented and NOT executed by the scaffold. It prints the licence, states what it
-would fetch, and exits.
+Downloads pinned annotations and original Spider resources; never fetches paid APIs.
 
 LICENCE: ViText2SQL is released for research and educational purposes only, with no
 redistribution in any form. That is why this repository ships a script instead of data, why
@@ -14,7 +13,10 @@ than buried in a README.
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import sys
+import urllib.request
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -22,8 +24,10 @@ TARGET_DIR = REPO_ROOT / "data" / "external" / "vitext2sql"
 
 # Version pin. Every reported number states the version it was measured on.
 SOURCE_REPO = "https://github.com/VinAIResearch/ViText2SQL"
-VERSION_TAG = "main@TODO-pin-a-commit-sha"  # TODO(phase2): pin an exact commit before any run
-SUBSET_SIZE = 100
+VERSION_TAG = "e759141d891feb794bb9a9fb912d544b25583b3c"
+SPIDER_COMMIT = "b7b5b8c890cd30e35427348bb9eb8c6d1350ca7c"
+SPIDER_ARCHIVE_SHA256 = "00636695dabed6b5f4b8328a16b13e069a2f16591d5efcce57660669c85b121b"
+SPIDER_ARCHIVE_URL = "https://drive.usercontent.google.com/download?id=1403EGqzIDoHMdQF4c9Bkyl7dZLZ5Wt6J&export=download&confirm=t"
 
 LICENSE_NOTICE = f"""
 ================================================================================
@@ -49,12 +53,40 @@ must be reported separately.
 """
 
 
+def sha256(path: Path) -> str:
+    with path.open("rb") as stream:
+        return hashlib.file_digest(stream, "sha256").hexdigest()
+
+
+def fetch(url: str, target: Path, *, archive: bool = False) -> dict:
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if not target.exists():
+        temporary = target.with_suffix(target.suffix + ".partial")
+        request = urllib.request.Request(url, headers={"User-Agent": "viet-text2sql-research"})
+        with urllib.request.urlopen(request, timeout=180) as response, temporary.open("wb") as out:
+            while chunk := response.read(1024 * 1024):
+                out.write(chunk)
+        if archive:
+            from zipfile import ZipFile
+
+            with ZipFile(temporary) as zipped:
+                if "spider_data/database/architecture/architecture.sqlite" not in zipped.namelist():
+                    raise ValueError("Unexpected Spider archive layout")
+        elif target.suffix == ".json":
+            json.loads(temporary.read_text(encoding="utf-8"))
+        temporary.replace(target)
+    actual_hash = sha256(target)
+    if archive and actual_hash != SPIDER_ARCHIVE_SHA256:
+        raise ValueError("Spider archive differs from the pinned SHA-256; review a new version")
+    return {"url": url, "path": str(target.relative_to(REPO_ROOT)), "sha256": actual_hash}
+
+
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Download the ViText2SQL subset (stub).")
+    parser = argparse.ArgumentParser(description="Download pinned ViText2SQL and Spider resources.")
     parser.add_argument(
         "--accept-license", action="store_true", help="acknowledge the notice above"
     )
-    parser.add_argument("--n", type=int, default=SUBSET_SIZE, help="subset size to sample")
+    parser.add_argument("--splits", nargs="+", choices=["train", "dev", "test"], default=["dev"])
     args = parser.parse_args(argv)
 
     print(LICENSE_NOTICE)
@@ -62,15 +94,27 @@ def main(argv: list[str] | None = None) -> int:
         print("Re-run with --accept-license to proceed. Nothing was downloaded.")
         return 0
 
-    print(f"Would download {SOURCE_REPO} @ {VERSION_TAG}")
-    print(f"Would sample {args.n} items into {TARGET_DIR}")
-    print("Would then require a manual audit of a sample before any number is reported.\n")
-
-    raise NotImplementedError(  # TODO(phase2)
-        "download_vitext2sql is a stub. Implement it in phase 2 (proposal week 5-6), and pin "
-        "VERSION_TAG to an exact commit SHA first — an unpinned benchmark subset makes every "
-        "number derived from it unreproducible."
-    )
+    sources = []
+    vi_base = f"https://raw.githubusercontent.com/VinAIResearch/ViText2SQL/{VERSION_TAG}"
+    for name in ["tables.json", *[f"{split}.json" for split in sorted(set(args.splits))]]:
+        sources.append(
+            fetch(f"{vi_base}/data/syllable-level/{name}", TARGET_DIR / "raw/syllable-level" / name)
+        )
+    sources.append(fetch(f"{vi_base}/README.md", TARGET_DIR / "raw/README.md"))
+    spider = REPO_ROOT / "data/external/spider/raw"
+    en_base = f"https://raw.githubusercontent.com/taoyds/spider/{SPIDER_COMMIT}/evaluation_examples/examples"
+    for name in ("tables.json", "train_spider.json", "dev.json"):
+        sources.append(fetch(f"{en_base}/{name}", spider / name))
+    sources.append(fetch(SPIDER_ARCHIVE_URL, spider / "spider_data.zip", archive=True))
+    manifest = {
+        "vitext2sql_commit": VERSION_TAG,
+        "spider_commit": SPIDER_COMMIT,
+        "license_acknowledged": True,
+        "sources": sources,
+    }
+    (TARGET_DIR / "sources.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    print(f"Saved {len(sources)} source hashes to {TARGET_DIR / 'sources.json'}")
+    return 0
 
 
 if __name__ == "__main__":

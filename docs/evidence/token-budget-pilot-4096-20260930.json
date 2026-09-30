@@ -1,0 +1,52 @@
+{
+  "label": "Development pilot; excluded from full-run denominator",
+  "run": "eval/results/20260930-145221-811436-live-local-dev",
+  "model": "qwen3:4b",
+  "model_digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+  "questions_sha256": "2695b833253463aa59faf5d33585b0dccd7dcfca4d9727c2b18b54b1fb8a8ecc",
+  "snapshot_sha256": "bb4f8c9127389527e9905622979db6c35b6b6ace91ee40c5ef5b31ee74b89e70",
+  "model_options": {
+    "temperature": 0,
+    "num_ctx": 8192,
+    "num_predict": 4096,
+    "seed": 42,
+    "think": true
+  },
+  "evaluated_ids": [
+    "cancelled_orders_north",
+    "revenue_q2_north",
+    "units_2026_north",
+    "sold_categories_north"
+  ],
+  "summary": {
+    "baseline": {
+      "n": 4,
+      "strict_correct": 1,
+      "relaxed_correct": 1,
+      "strict_ex": 25.0,
+      "relaxed_ex": 25.0,
+      "items_with_output_cap_hit": 1,
+      "no_successful_sql": 1,
+      "p50_ms": 55522.64,
+      "p95_ms": 80046.47,
+      "avg_tokens": 4112.0
+    },
+    "agent": {
+      "n": 4,
+      "strict_correct": 0,
+      "relaxed_correct": 0,
+      "strict_ex": 0.0,
+      "relaxed_ex": 0.0,
+      "items_with_output_cap_hit": 1,
+      "no_successful_sql": 1,
+      "p50_ms": 79939.78,
+      "p95_ms": 103275.19,
+      "avg_tokens": 6132.0
+    }
+  },
+  "raw_file_sha256": {
+    "summary": "6e67766d3ef41c5c87500e70a2d71455112a936a5f4dc5e226f684a87342d0d3",
+    "items": "59a159f5393d21bd9b225ac4ba756a173d3b9e58686c6199e9f6924ffb851f49",
+    "config": "116857e10a20f3e18790d224e9ba970fb0a844858875e0e5da0fb7acf3819bd0"
+  }
+}

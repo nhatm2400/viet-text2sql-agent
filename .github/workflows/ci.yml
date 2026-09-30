@@ -114,6 +114,9 @@ jobs:
       - name: Evaluation harness, offline
         run: python -m eval.harness.runner --config eval/configs/baseline.yaml --offline
 
+      - name: Gold SQL and semantic mutation validation, local SQLite
+        run: python -m eval.harness.local_validation
+
       - name: Upload results
         if: always()
         uses: actions/upload-artifact@v4

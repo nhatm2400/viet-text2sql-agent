@@ -71,16 +71,39 @@ def load_foreign_keys(path: str | None = None) -> dict[str, list[str]]:
     return fks
 
 
-def schema_block() -> str:
+@lru_cache(maxsize=2)
+def load_check_constraints(path: str | None = None) -> dict[str, list[str]]:
+    """Preserve complete CHECK predicates, including enum values, from the schema AST."""
+    target = Path(path) if path else get_settings().schema_sql_path
+    constraints: dict[str, list[str]] = {}
+    for statement in sqlglot.parse(target.read_text(encoding="utf-8"), read="postgres"):
+        if not isinstance(statement, exp.Create) or statement.kind != "TABLE":
+            continue
+        table = statement.this
+        if not isinstance(table, exp.Schema):
+            continue
+        predicates = [
+            check.this.sql(dialect="postgres")
+            for check in table.find_all(exp.CheckColumnConstraint)
+        ]
+        if predicates:
+            constraints[table.this.name.lower()] = predicates
+    return constraints
+
+
+def schema_block(*, include_checks: bool = True) -> str:
     """Compact, token-cheap rendering of the whole schema for the system prompt."""
     schema = load_schema()
     fks = load_foreign_keys()
+    checks = load_check_constraints() if include_checks else {}
     lines: list[str] = []
     for table, columns in schema.items():
         cols = ", ".join(f"{c} {t}" for c, t in columns.items())
         lines.append(f"{table}({cols})")
         for fk in fks.get(table, []):
             lines.append(f"    FK {fk}")
+        for check in checks.get(table, []):
+            lines.append(f"    CHECK {check}")
     return "\n".join(lines)
 
 
@@ -105,7 +128,7 @@ def list_schema() -> dict:
 
 @tool
 def get_table_schema(table_name: str) -> dict:
-    """Get the columns, types and foreign keys of one table.
+    """Get the columns, types, foreign keys and CHECK constraints of one table.
 
     Args:
         table_name: exact table name, e.g. "orders". Case-insensitive.
@@ -122,6 +145,7 @@ def get_table_schema(table_name: str) -> dict:
         table=key,
         columns=schema[key],
         foreign_keys=load_foreign_keys().get(key, []),
+        check_constraints=load_check_constraints().get(key, []),
     ).to_dict()
 
 

@@ -1,0 +1,2521 @@
+{
+  "label": "AI-reviewed; human review remains pending; not model accuracy",
+  "package": "data\\benchmark_v2_ai_reviewed",
+  "snapshot_sha256": "bb4f8c9127389527e9905622979db6c35b6b6ace91ee40c5ef5b31ee74b89e70",
+  "questions_sha256": "76e837ef487f9e329fb81e8b119937a0a0533198b54309f394f01a6131cd593a",
+  "source_sha256": {
+    "eval/harness/ai_review.py": "dbaa33d6743e36ebb1cf00b784b28752aa214bc24d99bfd5795bb23580f2b276",
+    "eval/datasets/review_oracles.py": "8fb6c03c715fcbf79ac7269489b52add263b45e07b2f00c270359fbfd65b60f0",
+    "eval/datasets/local_dev/oracles.py": "5c9ab46dbd67d5d7a11311b9af0a4f513f168b72deede23a0d1c3bc7af64a165"
+  },
+  "summary": {
+    "cases": 50,
+    "python_matches": 50,
+    "policy_preserves_result": 50,
+    "edge_checks": 12,
+    "edge_passes": 12,
+    "mutants_rejected": 12
+  },
+  "items": [
+    {
+      "id": "active_customers_north",
+      "family": "active_customers",
+      "split": "dev",
+      "python_match": true,
+      "gold": [
+        [
+          1354
+        ]
+      ],
+      "reference": [
+        [
+          1354
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Có bao nhiêu khách hàng ở miền Bắc có customers.status = 'active'?",
+      "gold_sql": "SELECT COUNT(*) AS value FROM customers c JOIN regions r ON r.region_id = c.region_id WHERE r.region_code = 'NORTH' AND c.status = 'active'"
+    },
+    {
+      "id": "active_customers_central",
+      "family": "active_customers",
+      "split": "dev",
+      "python_match": true,
+      "gold": [
+        [
+          744
+        ]
+      ],
+      "reference": [
+        [
+          744
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Có bao nhiêu khách hàng ở miền Trung có customers.status = 'active'?",
+      "gold_sql": "SELECT COUNT(*) AS value FROM customers c JOIN regions r ON r.region_id = c.region_id WHERE r.region_code = 'CENTRAL' AND c.status = 'active'"
+    },
+    {
+      "id": "cancelled_orders_north",
+      "family": "cancelled_orders",
+      "split": "dev",
+      "python_match": true,
+      "gold": [
+        [
+          359
+        ]
+      ],
+      "reference": [
+        [
+          359
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Đếm đơn bị hủy của khách ở miền Bắc, đặt từ 01/01 đến trước 01/07/2026.",
+      "gold_sql": "SELECT COUNT(*) AS value FROM orders o JOIN customers c ON c.customer_id = o.customer_id JOIN regions r ON r.region_id = c.region_id WHERE r.region_code = 'NORTH' AND o.status = 'cancelled' AND o.created_at >= '2026-01-01' AND o.created_at < '2026-07-01'"
+    },
+    {
+      "id": "cancelled_orders_central",
+      "family": "cancelled_orders",
+      "split": "dev",
+      "python_match": true,
+      "gold": [
+        [
+          210
+        ]
+      ],
+      "reference": [
+        [
+          210
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Đếm đơn bị hủy của khách ở miền Trung, đặt từ 01/01 đến trước 01/07/2026.",
+      "gold_sql": "SELECT COUNT(*) AS value FROM orders o JOIN customers c ON c.customer_id = o.customer_id JOIN regions r ON r.region_id = c.region_id WHERE r.region_code = 'CENTRAL' AND o.status = 'cancelled' AND o.created_at >= '2026-01-01' AND o.created_at < '2026-07-01'"
+    },
+    {
+      "id": "revenue_q2_north",
+      "family": "revenue_q2",
+      "split": "dev",
+      "python_match": true,
+      "gold": [
+        [
+          185870004361.3
+        ]
+      ],
+      "reference": [
+        [
+          185870004361.3
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Tổng payments.amount đã succeeded trong quý 2/2026 theo paid_at, của khách ở miền Bắc; làm tròn 2 chữ số.",
+      "gold_sql": "SELECT ROUND(SUM(p.amount), 2) AS value FROM payments p JOIN orders o ON o.order_id = p.order_id JOIN customers c ON c.customer_id = o.customer_id JOIN regions r ON r.region_id = c.region_id WHERE r.region_code = 'NORTH' AND p.status = 'succeeded' AND p.paid_at >= '2026-04-01' AND p.paid_at < '2026-07-01'"
+    },
+    {
+      "id": "revenue_q2_central",
+      "family": "revenue_q2",
+      "split": "dev",
+      "python_match": true,
+      "gold": [
+        [
+          111093037734.47
+        ]
+      ],
+      "reference": [
+        [
+          111093037734.47
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Tổng payments.amount đã succeeded trong quý 2/2026 theo paid_at, của khách ở miền Trung; làm tròn 2 chữ số.",
+      "gold_sql": "SELECT ROUND(SUM(p.amount), 2) AS value FROM payments p JOIN orders o ON o.order_id = p.order_id JOIN customers c ON c.customer_id = o.customer_id JOIN regions r ON r.region_id = c.region_id WHERE r.region_code = 'CENTRAL' AND p.status = 'succeeded' AND p.paid_at >= '2026-04-01' AND p.paid_at < '2026-07-01'"
+    },
+    {
+      "id": "units_2026_north",
+      "family": "units_2026",
+      "split": "dev",
+      "python_match": true,
+      "gold": [
+        [
+          31038
+        ]
+      ],
+      "reference": [
+        [
+          31038
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Tổng số lượng order_items của đơn đặt năm 2026, loại đơn cancelled, của khách ở miền Bắc?",
+      "gold_sql": "SELECT SUM(oi.quantity) AS value FROM order_items oi JOIN orders o ON o.order_id = oi.order_id JOIN customers c ON c.customer_id = o.customer_id JOIN regions r ON r.region_id = c.region_id WHERE r.region_code = 'NORTH' AND o.status <> 'cancelled' AND o.created_at >= '2026-01-01' AND o.created_at < '2027-01-01'"
+    },
+    {
+      "id": "units_2026_central",
+      "family": "units_2026",
+      "split": "dev",
+      "python_match": true,
+      "gold": [
+        [
+          17762
+        ]
+      ],
+      "reference": [
+        [
+          17762
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Tổng số lượng order_items của đơn đặt năm 2026, loại đơn cancelled, của khách ở miền Trung?",
+      "gold_sql": "SELECT SUM(oi.quantity) AS value FROM order_items oi JOIN orders o ON o.order_id = oi.order_id JOIN customers c ON c.customer_id = o.customer_id JOIN regions r ON r.region_id = c.region_id WHERE r.region_code = 'CENTRAL' AND o.status <> 'cancelled' AND o.created_at >= '2026-01-01' AND o.created_at < '2027-01-01'"
+    },
+    {
+      "id": "low_stock_north",
+      "family": "low_stock",
+      "split": "dev",
+      "python_match": true,
+      "gold": [
+        [
+          17
+        ]
+      ],
+      "reference": [
+        [
+          17
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Đếm dòng tồn kho có quantity <= reorder_level, sản phẩm thuộc nhà cung cấp ở miền Bắc.",
+      "gold_sql": "SELECT COUNT(*) AS value FROM inventory i JOIN products pr ON pr.product_id = i.product_id JOIN suppliers s ON s.supplier_id = pr.supplier_id JOIN regions r ON r.region_id = s.region_id WHERE r.region_code = 'NORTH' AND i.quantity <= i.reorder_level"
+    },
+    {
+      "id": "low_stock_central",
+      "family": "low_stock",
+      "split": "dev",
+      "python_match": true,
+      "gold": [
+        [
+          11
+        ]
+      ],
+      "reference": [
+        [
+          11
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Đếm dòng tồn kho có quantity <= reorder_level, sản phẩm thuộc nhà cung cấp ở miền Trung.",
+      "gold_sql": "SELECT COUNT(*) AS value FROM inventory i JOIN products pr ON pr.product_id = i.product_id JOIN suppliers s ON s.supplier_id = pr.supplier_id JOIN regions r ON r.region_id = s.region_id WHERE r.region_code = 'CENTRAL' AND i.quantity <= i.reorder_level"
+    },
+    {
+      "id": "active_products_north",
+      "family": "active_products",
+      "split": "dev",
+      "python_match": true,
+      "gold": [
+        [
+          112
+        ]
+      ],
+      "reference": [
+        [
+          112
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Đếm sản phẩm có is_active = TRUE của nhà cung cấp ở miền Bắc, không lọc trạng thái nhà cung cấp.",
+      "gold_sql": "SELECT COUNT(*) AS value FROM products pr JOIN suppliers s ON s.supplier_id = pr.supplier_id JOIN regions r ON r.region_id = s.region_id WHERE r.region_code = 'NORTH' AND pr.is_active = TRUE"
+    },
+    {
+      "id": "active_products_central",
+      "family": "active_products",
+      "split": "dev",
+      "python_match": true,
+      "gold": [
+        [
+          90
+        ]
+      ],
+      "reference": [
+        [
+          90
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Đếm sản phẩm có is_active = TRUE của nhà cung cấp ở miền Trung, không lọc trạng thái nhà cung cấp.",
+      "gold_sql": "SELECT COUNT(*) AS value FROM products pr JOIN suppliers s ON s.supplier_id = pr.supplier_id JOIN regions r ON r.region_id = s.region_id WHERE r.region_code = 'CENTRAL' AND pr.is_active = TRUE"
+    },
+    {
+      "id": "delivered_shipments_north",
+      "family": "delivered_shipments",
+      "split": "dev",
+      "python_match": true,
+      "gold": [
+        [
+          3909
+        ]
+      ],
+      "reference": [
+        [
+          3909
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Đếm shipment có status = 'delivered' của khách ở miền Bắc, xác định miền qua khách hàng của đơn.",
+      "gold_sql": "SELECT COUNT(*) AS value FROM shipments sh JOIN orders o ON o.order_id = sh.order_id JOIN customers c ON c.customer_id = o.customer_id JOIN regions r ON r.region_id = c.region_id WHERE r.region_code = 'NORTH' AND sh.status = 'delivered'"
+    },
+    {
+      "id": "delivered_shipments_central",
+      "family": "delivered_shipments",
+      "split": "dev",
+      "python_match": true,
+      "gold": [
+        [
+          2221
+        ]
+      ],
+      "reference": [
+        [
+          2221
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Đếm shipment có status = 'delivered' của khách ở miền Trung, xác định miền qua khách hàng của đơn.",
+      "gold_sql": "SELECT COUNT(*) AS value FROM shipments sh JOIN orders o ON o.order_id = sh.order_id JOIN customers c ON c.customer_id = o.customer_id JOIN regions r ON r.region_id = c.region_id WHERE r.region_code = 'CENTRAL' AND sh.status = 'delivered'"
+    },
+    {
+      "id": "positive_reviews_north",
+      "family": "positive_reviews",
+      "split": "dev",
+      "python_match": true,
+      "gold": [
+        [
+          1123
+        ]
+      ],
+      "reference": [
+        [
+          1123
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Đếm review từ 4 sao trở lên của khách ở miền Bắc, trên toàn bộ dữ liệu.",
+      "gold_sql": "SELECT COUNT(*) AS value FROM reviews v JOIN customers c ON c.customer_id = v.customer_id JOIN regions r ON r.region_id = c.region_id WHERE r.region_code = 'NORTH' AND v.rating >= 4"
+    },
+    {
+      "id": "positive_reviews_central",
+      "family": "positive_reviews",
+      "split": "dev",
+      "python_match": true,
+      "gold": [
+        [
+          685
+        ]
+      ],
+      "reference": [
+        [
+          685
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Đếm review từ 4 sao trở lên của khách ở miền Trung, trên toàn bộ dữ liệu.",
+      "gold_sql": "SELECT COUNT(*) AS value FROM reviews v JOIN customers c ON c.customer_id = v.customer_id JOIN regions r ON r.region_id = c.region_id WHERE r.region_code = 'CENTRAL' AND v.rating >= 4"
+    },
+    {
+      "id": "default_addresses_north",
+      "family": "default_addresses",
+      "split": "dev",
+      "python_match": true,
+      "gold": [
+        [
+          1799
+        ]
+      ],
+      "reference": [
+        [
+          1799
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Đếm địa chỉ mặc định có addresses.region_id thuộc miền Bắc.",
+      "gold_sql": "SELECT COUNT(*) AS value FROM addresses a JOIN regions r ON r.region_id = a.region_id WHERE r.region_code = 'NORTH' AND a.is_default = TRUE"
+    },
+    {
+      "id": "default_addresses_central",
+      "family": "default_addresses",
+      "split": "dev",
+      "python_match": true,
+      "gold": [
+        [
+          990
+        ]
+      ],
+      "reference": [
+        [
+          990
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Đếm địa chỉ mặc định có addresses.region_id thuộc miền Trung.",
+      "gold_sql": "SELECT COUNT(*) AS value FROM addresses a JOIN regions r ON r.region_id = a.region_id WHERE r.region_code = 'CENTRAL' AND a.is_default = TRUE"
+    },
+    {
+      "id": "sold_categories_north",
+      "family": "sold_categories",
+      "split": "dev",
+      "python_match": true,
+      "gold": [
+        [
+          20
+        ]
+      ],
+      "reference": [
+        [
+          20
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Có bao nhiêu category_id khác nhau xuất hiện trong đơn không cancelled của khách ở miền Bắc, toàn kỳ?",
+      "gold_sql": "SELECT COUNT(DISTINCT cat.category_id) AS value FROM categories cat JOIN products pr ON pr.category_id = cat.category_id JOIN order_items oi ON oi.product_id = pr.product_id JOIN orders o ON o.order_id = oi.order_id JOIN customers c ON c.customer_id = o.customer_id JOIN regions r ON r.region_id = c.region_id WHERE r.region_code = 'NORTH' AND o.status <> 'cancelled'"
+    },
+    {
+      "id": "sold_categories_central",
+      "family": "sold_categories",
+      "split": "dev",
+      "python_match": true,
+      "gold": [
+        [
+          20
+        ]
+      ],
+      "reference": [
+        [
+          20
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Có bao nhiêu category_id khác nhau xuất hiện trong đơn không cancelled của khách ở miền Trung, toàn kỳ?",
+      "gold_sql": "SELECT COUNT(DISTINCT cat.category_id) AS value FROM categories cat JOIN products pr ON pr.category_id = cat.category_id JOIN order_items oi ON oi.product_id = pr.product_id JOIN orders o ON o.order_id = oi.order_id JOIN customers c ON c.customer_id = o.customer_id JOIN regions r ON r.region_id = c.region_id WHERE r.region_code = 'CENTRAL' AND o.status <> 'cancelled'"
+    },
+    {
+      "id": "test_01",
+      "family": "revenue_method_segment",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          "bank_transfer",
+          "retail",
+          76143442046.91
+        ],
+        [
+          "bank_transfer",
+          "vip",
+          9157970367.45
+        ],
+        [
+          "bank_transfer",
+          "wholesale",
+          19352361350.71
+        ],
+        [
+          "card",
+          "retail",
+          92972201316.64
+        ],
+        [
+          "card",
+          "vip",
+          11849812313.39
+        ],
+        [
+          "card",
+          "wholesale",
+          28292595280.52
+        ],
+        [
+          "cod",
+          "retail",
+          115059210288.11
+        ],
+        [
+          "cod",
+          "vip",
+          15891917870.86
+        ],
+        [
+          "cod",
+          "wholesale",
+          30325210034.38
+        ],
+        [
+          "ewallet",
+          "retail",
+          93930140152.97
+        ],
+        [
+          "ewallet",
+          "vip",
+          12165559773.06
+        ],
+        [
+          "ewallet",
+          "wholesale",
+          25968960062.93
+        ]
+      ],
+      "reference": [
+        [
+          "bank_transfer",
+          "retail",
+          76143442046.91
+        ],
+        [
+          "bank_transfer",
+          "vip",
+          9157970367.45
+        ],
+        [
+          "bank_transfer",
+          "wholesale",
+          19352361350.71
+        ],
+        [
+          "card",
+          "retail",
+          92972201316.64
+        ],
+        [
+          "card",
+          "vip",
+          11849812313.39
+        ],
+        [
+          "card",
+          "wholesale",
+          28292595280.52
+        ],
+        [
+          "cod",
+          "retail",
+          115059210288.11
+        ],
+        [
+          "cod",
+          "vip",
+          15891917870.86
+        ],
+        [
+          "cod",
+          "wholesale",
+          30325210034.38
+        ],
+        [
+          "ewallet",
+          "retail",
+          93930140152.97
+        ],
+        [
+          "ewallet",
+          "vip",
+          12165559773.06
+        ],
+        [
+          "ewallet",
+          "wholesale",
+          25968960062.93
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Tiền thanh toán succeeded quý 2/2026 theo paid_at, chia theo method và segment khách? Trả method, segment và tổng amount làm tròn 2 số; xếp method rồi segment.",
+      "gold_sql": "SELECT p.method,c.segment,ROUND(SUM(p.amount),2) AS revenue FROM payments p JOIN orders o ON o.order_id=p.order_id JOIN customers c ON c.customer_id=o.customer_id WHERE p.status='succeeded' AND p.paid_at >= '2026-04-01' AND p.paid_at < '2026-07-01' GROUP BY p.method,c.segment ORDER BY p.method,c.segment"
+    },
+    {
+      "id": "test_02",
+      "family": "multiple_payment_methods",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          3750
+        ]
+      ],
+      "reference": [
+        [
+          3750
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Có bao nhiêu khách đã thanh toán succeeded bằng ít nhất 2 method khác nhau, trên toàn bộ dữ liệu?",
+      "gold_sql": "SELECT COUNT(*) AS n FROM (SELECT o.customer_id FROM orders o JOIN payments p ON p.order_id=o.order_id WHERE p.status='succeeded' GROUP BY o.customer_id HAVING COUNT(DISTINCT p.method)>=2) t"
+    },
+    {
+      "id": "test_03",
+      "family": "cancel_rate",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          "app",
+          4415,
+          8.13
+        ],
+        [
+          "marketplace",
+          1245,
+          8.92
+        ],
+        [
+          "store",
+          1988,
+          8.75
+        ],
+        [
+          "web",
+          5098,
+          7.34
+        ]
+      ],
+      "reference": [
+        [
+          "app",
+          4415,
+          8.13
+        ],
+        [
+          "marketplace",
+          1245,
+          8.92
+        ],
+        [
+          "store",
+          1988,
+          8.75
+        ],
+        [
+          "web",
+          5098,
+          7.34
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Tỷ lệ đơn cancelled theo kênh trong H1/2026 theo ngày đặt? Trả kênh, tổng đơn, phần trăm hủy làm tròn 2 số; xếp theo kênh.",
+      "gold_sql": "SELECT channel,COUNT(*) AS total_orders,ROUND(100.0*SUM(CASE WHEN status='cancelled' THEN 1 ELSE 0 END)/COUNT(*),2) AS cancelled_pct FROM orders WHERE created_at >= '2026-01-01' AND created_at < '2026-07-01' GROUP BY channel ORDER BY channel"
+    },
+    {
+      "id": "test_04",
+      "family": "aov_paid",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          "app",
+          91758581.19
+        ],
+        [
+          "marketplace",
+          94190274.88
+        ],
+        [
+          "store",
+          93143057.33
+        ],
+        [
+          "web",
+          90923115.12
+        ]
+      ],
+      "reference": [
+        [
+          "app",
+          91758581.19
+        ],
+        [
+          "marketplace",
+          94190274.88
+        ],
+        [
+          "store",
+          93143057.33
+        ],
+        [
+          "web",
+          90923115.12
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Giá trị đơn trung bình theo kênh trong quý 2/2026 theo ngày đặt, chỉ đơn có ít nhất một payment succeeded? Dùng orders.total_amount, làm tròn 2 số và xếp theo kênh.",
+      "gold_sql": "SELECT o.channel,ROUND(AVG(o.total_amount),2) AS aov FROM orders o WHERE o.created_at >= '2026-04-01' AND o.created_at < '2026-07-01' AND EXISTS (SELECT 1 FROM payments p WHERE p.order_id=o.order_id AND p.status='succeeded') GROUP BY o.channel ORDER BY o.channel"
+    },
+    {
+      "id": "test_05",
+      "family": "no_orders",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          94
+        ]
+      ],
+      "reference": [
+        [
+          94
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Có bao nhiêu khách chưa từng có đơn hàng?",
+      "gold_sql": "SELECT COUNT(*) AS n FROM customers c WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id)"
+    },
+    {
+      "id": "test_06",
+      "family": "repeat_buyers",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          916
+        ]
+      ],
+      "reference": [
+        [
+          916
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Có bao nhiêu khách có ít nhất 3 đơn completed trong H1/2026 theo created_at?",
+      "gold_sql": "SELECT COUNT(*) AS n FROM (SELECT customer_id FROM orders WHERE status='completed' AND created_at >= '2026-01-01' AND created_at < '2026-07-01' GROUP BY customer_id HAVING COUNT(*)>=3) t"
+    },
+    {
+      "id": "test_07",
+      "family": "category_quantity",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          20,
+          "Garden",
+          3763
+        ],
+        [
+          11,
+          "Groceries",
+          3748
+        ],
+        [
+          18,
+          "Automotive",
+          3654
+        ],
+        [
+          2,
+          "Mobile Phones",
+          3437
+        ],
+        [
+          7,
+          "Men Apparel",
+          2931
+        ]
+      ],
+      "reference": [
+        [
+          20,
+          "Garden",
+          3763
+        ],
+        [
+          11,
+          "Groceries",
+          3748
+        ],
+        [
+          18,
+          "Automotive",
+          3654
+        ],
+        [
+          2,
+          "Mobile Phones",
+          3437
+        ],
+        [
+          7,
+          "Men Apparel",
+          2931
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Top 5 nhóm hàng theo tổng số lượng trong đơn completed năm 2026 theo created_at, trả category_id, tên, số lượng; hòa thì mã nhỏ trước.",
+      "gold_sql": "SELECT cat.category_id,cat.category_name,SUM(i.quantity) AS units FROM categories cat JOIN products pr ON pr.category_id=cat.category_id JOIN order_items i ON i.product_id=pr.product_id JOIN orders o ON o.order_id=i.order_id WHERE o.status='completed' AND o.created_at >= '2026-01-01' AND o.created_at < '2027-01-01' GROUP BY cat.category_id,cat.category_name ORDER BY units DESC,cat.category_id LIMIT 5"
+    },
+    {
+      "id": "test_08",
+      "family": "never_sold",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          0
+        ]
+      ],
+      "reference": [
+        [
+          0
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": true,
+      "question": "Có bao nhiêu sản phẩm chưa xuất hiện trong bất kỳ order_items nào?",
+      "gold_sql": "SELECT COUNT(*) AS n FROM products p WHERE NOT EXISTS (SELECT 1 FROM order_items i WHERE i.product_id=p.product_id)"
+    },
+    {
+      "id": "test_09",
+      "family": "inventory_by_warehouse",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          "DN-01",
+          39672,
+          156
+        ],
+        [
+          "HCM-01",
+          35357,
+          141
+        ],
+        [
+          "HCM-02",
+          36607,
+          156
+        ],
+        [
+          "HN-01",
+          38363,
+          160
+        ]
+      ],
+      "reference": [
+        [
+          "DN-01",
+          39672,
+          156
+        ],
+        [
+          "HCM-01",
+          35357,
+          141
+        ],
+        [
+          "HCM-02",
+          36607,
+          156
+        ],
+        [
+          "HN-01",
+          38363,
+          160
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Tổng tồn kho và số sản phẩm khác nhau theo warehouse? Xếp theo warehouse.",
+      "gold_sql": "SELECT warehouse,SUM(quantity) AS units,COUNT(DISTINCT product_id) AS products FROM inventory GROUP BY warehouse ORDER BY warehouse"
+    },
+    {
+      "id": "test_10",
+      "family": "out_of_stock",
+      "split": "test",
+      "python_match": true,
+      "gold": [],
+      "reference": [],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": true,
+      "scalar_zero_or_null": false,
+      "question": "Trong các sản phẩm có ít nhất một bản ghi inventory, liệt kê mã sản phẩm có tổng quantity ở mọi kho bằng 0, sắp theo mã. Không tính sản phẩm chưa có bản ghi inventory.",
+      "gold_sql": "SELECT product_id FROM inventory GROUP BY product_id HAVING SUM(quantity)=0 ORDER BY product_id"
+    },
+    {
+      "id": "test_11",
+      "family": "supplier_catalog",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          3,
+          10
+        ],
+        [
+          4,
+          9
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          7,
+          6
+        ],
+        [
+          8,
+          7
+        ],
+        [
+          9,
+          13
+        ],
+        [
+          11,
+          6
+        ],
+        [
+          13,
+          6
+        ],
+        [
+          15,
+          6
+        ],
+        [
+          16,
+          4
+        ],
+        [
+          17,
+          7
+        ],
+        [
+          18,
+          7
+        ],
+        [
+          19,
+          10
+        ],
+        [
+          20,
+          5
+        ],
+        [
+          21,
+          6
+        ],
+        [
+          22,
+          8
+        ],
+        [
+          23,
+          6
+        ],
+        [
+          24,
+          7
+        ],
+        [
+          25,
+          3
+        ],
+        [
+          26,
+          2
+        ],
+        [
+          27,
+          11
+        ],
+        [
+          28,
+          6
+        ],
+        [
+          29,
+          5
+        ],
+        [
+          31,
+          10
+        ],
+        [
+          32,
+          12
+        ],
+        [
+          33,
+          6
+        ],
+        [
+          34,
+          8
+        ],
+        [
+          35,
+          7
+        ],
+        [
+          36,
+          3
+        ],
+        [
+          37,
+          13
+        ],
+        [
+          38,
+          5
+        ],
+        [
+          39,
+          3
+        ],
+        [
+          40,
+          5
+        ]
+      ],
+      "reference": [
+        [
+          3,
+          10
+        ],
+        [
+          4,
+          9
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          7,
+          6
+        ],
+        [
+          8,
+          7
+        ],
+        [
+          9,
+          13
+        ],
+        [
+          11,
+          6
+        ],
+        [
+          13,
+          6
+        ],
+        [
+          15,
+          6
+        ],
+        [
+          16,
+          4
+        ],
+        [
+          17,
+          7
+        ],
+        [
+          18,
+          7
+        ],
+        [
+          19,
+          10
+        ],
+        [
+          20,
+          5
+        ],
+        [
+          21,
+          6
+        ],
+        [
+          22,
+          8
+        ],
+        [
+          23,
+          6
+        ],
+        [
+          24,
+          7
+        ],
+        [
+          25,
+          3
+        ],
+        [
+          26,
+          2
+        ],
+        [
+          27,
+          11
+        ],
+        [
+          28,
+          6
+        ],
+        [
+          29,
+          5
+        ],
+        [
+          31,
+          10
+        ],
+        [
+          32,
+          12
+        ],
+        [
+          33,
+          6
+        ],
+        [
+          34,
+          8
+        ],
+        [
+          35,
+          7
+        ],
+        [
+          36,
+          3
+        ],
+        [
+          37,
+          13
+        ],
+        [
+          38,
+          5
+        ],
+        [
+          39,
+          3
+        ],
+        [
+          40,
+          5
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Mỗi nhà cung cấp active có bao nhiêu sản phẩm active? Trả supplier_id và số lượng, giữ cả nhà cung cấp có 0 sản phẩm; xếp theo mã.",
+      "gold_sql": "SELECT s.supplier_id,COUNT(p.product_id) AS n FROM suppliers s LEFT JOIN products p ON p.supplier_id=s.supplier_id AND p.is_active=TRUE WHERE s.is_active=TRUE GROUP BY s.supplier_id ORDER BY s.supplier_id"
+    },
+    {
+      "id": "test_12",
+      "family": "review_rank",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          245,
+          15,
+          4.6
+        ],
+        [
+          114,
+          19,
+          4.58
+        ],
+        [
+          166,
+          12,
+          4.58
+        ],
+        [
+          259,
+          10,
+          4.5
+        ],
+        [
+          6,
+          16,
+          4.44
+        ]
+      ],
+      "reference": [
+        [
+          245,
+          15,
+          4.6
+        ],
+        [
+          114,
+          19,
+          4.58
+        ],
+        [
+          166,
+          12,
+          4.58
+        ],
+        [
+          259,
+          10,
+          4.5
+        ],
+        [
+          6,
+          16,
+          4.44
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Top 5 sản phẩm có ít nhất 10 review theo điểm trung bình; trả mã, số review và điểm làm tròn 2 số, xếp điểm đã làm tròn giảm dần rồi mã.",
+      "gold_sql": "SELECT product_id,COUNT(*) AS n,ROUND(AVG(rating),2) AS rating FROM reviews GROUP BY product_id HAVING COUNT(*)>=10 ORDER BY rating DESC,product_id LIMIT 5"
+    },
+    {
+      "id": "test_13",
+      "family": "unreviewed",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          0
+        ]
+      ],
+      "reference": [
+        [
+          0
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": true,
+      "question": "Có bao nhiêu sản phẩm active chưa có review?",
+      "gold_sql": "SELECT COUNT(*) AS n FROM products p WHERE p.is_active=TRUE AND NOT EXISTS (SELECT 1 FROM reviews r WHERE r.product_id=p.product_id)"
+    },
+    {
+      "id": "test_14",
+      "family": "payment_methods",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          "bank_transfer",
+          3114,
+          288242932227.49
+        ],
+        [
+          "card",
+          3979,
+          353696660019.66
+        ],
+        [
+          "cod",
+          4762,
+          430195057715.2
+        ],
+        [
+          "ewallet",
+          3917,
+          355709189010.69
+        ]
+      ],
+      "reference": [
+        [
+          "bank_transfer",
+          3114,
+          288242932227.49
+        ],
+        [
+          "card",
+          3979,
+          353696660019.66
+        ],
+        [
+          "cod",
+          4762,
+          430195057715.2
+        ],
+        [
+          "ewallet",
+          3917,
+          355709189010.69
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Theo từng method, có bao nhiêu payment succeeded và tổng amount bao nhiêu (2 số thập phân), toàn kỳ? Xếp theo method.",
+      "gold_sql": "SELECT method,COUNT(*) AS n,ROUND(SUM(amount),2) AS amount FROM payments WHERE status='succeeded' GROUP BY method ORDER BY method"
+    },
+    {
+      "id": "test_15",
+      "family": "unpaid_orders",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          2678
+        ]
+      ],
+      "reference": [
+        [
+          2678
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Có bao nhiêu đơn không cancelled và không có payment succeeded?",
+      "gold_sql": "SELECT COUNT(*) AS n FROM orders o WHERE o.status<>'cancelled' AND NOT EXISTS (SELECT 1 FROM payments p WHERE p.order_id=o.order_id AND p.status='succeeded')"
+    },
+    {
+      "id": "test_16",
+      "family": "refund_amount",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          73748651235.68
+        ]
+      ],
+      "reference": [
+        [
+          73748651235.68
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Tổng amount của payment có status refunded trong dữ liệu, làm tròn 2 số thập phân?",
+      "gold_sql": "SELECT ROUND(SUM(amount),2) AS amount FROM payments WHERE status='refunded'"
+    },
+    {
+      "id": "test_17",
+      "family": "delivery_carriers",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          "ViettelPost",
+          2216
+        ],
+        [
+          "GHTK",
+          2209
+        ],
+        [
+          "GHN",
+          2201
+        ],
+        [
+          "J&T",
+          2149
+        ],
+        [
+          "VNPost",
+          2143
+        ]
+      ],
+      "reference": [
+        [
+          "ViettelPost",
+          2216
+        ],
+        [
+          "GHTK",
+          2209
+        ],
+        [
+          "GHN",
+          2201
+        ],
+        [
+          "J&T",
+          2149
+        ],
+        [
+          "VNPost",
+          2143
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Số shipment delivered theo carrier, xếp số lượng giảm dần rồi tên carrier.",
+      "gold_sql": "SELECT carrier,COUNT(*) AS n FROM shipments WHERE status='delivered' GROUP BY carrier ORDER BY n DESC,carrier"
+    },
+    {
+      "id": "test_18",
+      "family": "delivery_delay",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          2599
+        ]
+      ],
+      "reference": [
+        [
+          2599
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Có bao nhiêu shipment delivered hơn 5 ngày sau shipped_at? So thời điểm chính xác, không đếm ngày lịch.",
+      "gold_sql": "SELECT COUNT(*) AS n FROM shipments WHERE status='delivered' AND julianday(delivered_at) - julianday(shipped_at) > 5"
+    },
+    {
+      "id": "test_19",
+      "family": "multiple_addresses",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          1028
+        ]
+      ],
+      "reference": [
+        [
+          1028
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Có bao nhiêu khách có hơn một địa chỉ?",
+      "gold_sql": "SELECT COUNT(*) AS n FROM (SELECT customer_id FROM addresses GROUP BY customer_id HAVING COUNT(*)>1) t"
+    },
+    {
+      "id": "test_20",
+      "family": "city_customers",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          636
+        ]
+      ],
+      "reference": [
+        [
+          636
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Số khách khác nhau có ít nhất một địa chỉ ở TP.HCM?",
+      "gold_sql": "SELECT COUNT(DISTINCT customer_id) AS n FROM addresses WHERE city='TP.HCM'"
+    },
+    {
+      "id": "test_21",
+      "family": "new_customers",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          "retail",
+          700
+        ],
+        [
+          "vip",
+          90
+        ],
+        [
+          "wholesale",
+          186
+        ]
+      ],
+      "reference": [
+        [
+          "retail",
+          700
+        ],
+        [
+          "vip",
+          90
+        ],
+        [
+          "wholesale",
+          186
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Đếm khách mới theo segment, created_at trong quý 1/2026; xếp theo segment.",
+      "gold_sql": "SELECT segment,COUNT(*) AS n FROM customers WHERE created_at >= '2026-01-01' AND created_at < '2026-04-01' GROUP BY segment ORDER BY segment"
+    },
+    {
+      "id": "test_22",
+      "family": "discount_ratio",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          2.99
+        ]
+      ],
+      "reference": [
+        [
+          2.99
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Tổng discount của đơn completed chia tổng giá trị trước discount (total_amount + discount), tính phần trăm 2 số, toàn kỳ?",
+      "gold_sql": "SELECT ROUND(100.0*SUM(discount)/SUM(total_amount+discount),2) AS pct FROM orders WHERE status='completed'"
+    },
+    {
+      "id": "test_23",
+      "family": "high_value_orders",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          19135,
+          415332224.37
+        ],
+        [
+          19454,
+          378628273.61
+        ],
+        [
+          16658,
+          350514196.52
+        ],
+        [
+          10221,
+          345593243.34
+        ],
+        [
+          7635,
+          343259078.63
+        ],
+        [
+          14732,
+          342865108.61
+        ],
+        [
+          11291,
+          342638143.73
+        ],
+        [
+          6903,
+          339089949.08
+        ],
+        [
+          8763,
+          330192781.97
+        ],
+        [
+          16453,
+          329167554.01
+        ]
+      ],
+      "reference": [
+        [
+          19135,
+          415332224.37
+        ],
+        [
+          19454,
+          378628273.61
+        ],
+        [
+          16658,
+          350514196.52
+        ],
+        [
+          10221,
+          345593243.34
+        ],
+        [
+          7635,
+          343259078.63
+        ],
+        [
+          14732,
+          342865108.61
+        ],
+        [
+          11291,
+          342638143.73
+        ],
+        [
+          6903,
+          339089949.08
+        ],
+        [
+          8763,
+          330192781.97
+        ],
+        [
+          16453,
+          329167554.01
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "10 đơn completed có total_amount lớn nhất: trả order_id và total_amount, hòa thì mã nhỏ trước.",
+      "gold_sql": "SELECT order_id,total_amount FROM orders WHERE status='completed' ORDER BY total_amount DESC,order_id LIMIT 10"
+    },
+    {
+      "id": "test_24",
+      "family": "above_average_products",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          153
+        ]
+      ],
+      "reference": [
+        [
+          153
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Số sản phẩm có unit_price lớn hơn giá trung bình toàn bộ sản phẩm?",
+      "gold_sql": "SELECT COUNT(*) AS n FROM products WHERE unit_price > (SELECT AVG(unit_price) FROM products)"
+    },
+    {
+      "id": "test_25",
+      "family": "category_hierarchy",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          6,
+          "Fashion",
+          "Laptops"
+        ],
+        [
+          7,
+          "Men Apparel",
+          "Electronics"
+        ],
+        [
+          8,
+          "Women Apparel",
+          "Electronics"
+        ],
+        [
+          9,
+          "Footwear",
+          "Home Appliances"
+        ],
+        [
+          10,
+          "Beauty",
+          "Kitchen"
+        ],
+        [
+          11,
+          "Groceries",
+          "Laptops"
+        ],
+        [
+          12,
+          "Beverages",
+          "Kitchen"
+        ],
+        [
+          13,
+          "Books",
+          "Electronics"
+        ],
+        [
+          14,
+          "Toys",
+          "Laptops"
+        ],
+        [
+          15,
+          "Sports",
+          "Kitchen"
+        ],
+        [
+          16,
+          "Furniture",
+          "Electronics"
+        ],
+        [
+          17,
+          "Office Supplies",
+          "Electronics"
+        ],
+        [
+          18,
+          "Automotive",
+          "Mobile Phones"
+        ],
+        [
+          19,
+          "Pet Supplies",
+          "Electronics"
+        ],
+        [
+          20,
+          "Garden",
+          "Laptops"
+        ]
+      ],
+      "reference": [
+        [
+          6,
+          "Fashion",
+          "Laptops"
+        ],
+        [
+          7,
+          "Men Apparel",
+          "Electronics"
+        ],
+        [
+          8,
+          "Women Apparel",
+          "Electronics"
+        ],
+        [
+          9,
+          "Footwear",
+          "Home Appliances"
+        ],
+        [
+          10,
+          "Beauty",
+          "Kitchen"
+        ],
+        [
+          11,
+          "Groceries",
+          "Laptops"
+        ],
+        [
+          12,
+          "Beverages",
+          "Kitchen"
+        ],
+        [
+          13,
+          "Books",
+          "Electronics"
+        ],
+        [
+          14,
+          "Toys",
+          "Laptops"
+        ],
+        [
+          15,
+          "Sports",
+          "Kitchen"
+        ],
+        [
+          16,
+          "Furniture",
+          "Electronics"
+        ],
+        [
+          17,
+          "Office Supplies",
+          "Electronics"
+        ],
+        [
+          18,
+          "Automotive",
+          "Mobile Phones"
+        ],
+        [
+          19,
+          "Pet Supplies",
+          "Electronics"
+        ],
+        [
+          20,
+          "Garden",
+          "Laptops"
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Liệt kê category_id, tên nhóm con, tên nhóm cha của các nhóm có cha, xếp mã nhóm con.",
+      "gold_sql": "SELECT c.category_id,c.category_name AS child_name,p.category_name AS parent_name FROM categories c JOIN categories p ON p.category_id=c.parent_category_id ORDER BY c.category_id"
+    },
+    {
+      "id": "test_26",
+      "family": "distinct_buyers",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          "app",
+          1867
+        ],
+        [
+          "marketplace",
+          618
+        ],
+        [
+          "store",
+          939
+        ],
+        [
+          "web",
+          2070
+        ]
+      ],
+      "reference": [
+        [
+          "app",
+          1867
+        ],
+        [
+          "marketplace",
+          618
+        ],
+        [
+          "store",
+          939
+        ],
+        [
+          "web",
+          2070
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Số khách khác nhau có đơn completed theo kênh trong H1/2026 theo created_at, xếp kênh.",
+      "gold_sql": "SELECT channel,COUNT(DISTINCT customer_id) AS n FROM orders WHERE status='completed' AND created_at >= '2026-01-01' AND created_at < '2026-07-01' GROUP BY channel ORDER BY channel"
+    },
+    {
+      "id": "test_27",
+      "family": "both_channels",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          1517
+        ]
+      ],
+      "reference": [
+        [
+          1517
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Số khách đã có đơn completed ở cả web lẫn app, toàn kỳ?",
+      "gold_sql": "SELECT COUNT(*) AS n FROM (SELECT customer_id FROM orders WHERE status='completed' AND channel IN ('web','app') GROUP BY customer_id HAVING COUNT(DISTINCT channel)=2) t"
+    },
+    {
+      "id": "test_28",
+      "family": "multi_warehouse",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          108
+        ]
+      ],
+      "reference": [
+        [
+          108
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Có bao nhiêu sản phẩm có tồn kho tại ít nhất 3 warehouse khác nhau? Không yêu cầu quantity dương.",
+      "gold_sql": "SELECT COUNT(*) AS n FROM (SELECT product_id FROM inventory GROUP BY product_id HAVING COUNT(DISTINCT warehouse)>=3) t"
+    },
+    {
+      "id": "test_29",
+      "family": "customer_order_distribution",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          "retail",
+          "cancelled",
+          1082
+        ],
+        [
+          "retail",
+          "completed",
+          7715
+        ],
+        [
+          "retail",
+          "paid",
+          1726
+        ],
+        [
+          "retail",
+          "pending",
+          1298
+        ],
+        [
+          "retail",
+          "refunded",
+          574
+        ],
+        [
+          "retail",
+          "shipped",
+          1714
+        ],
+        [
+          "vip",
+          "cancelled",
+          153
+        ],
+        [
+          "vip",
+          "completed",
+          987
+        ],
+        [
+          "vip",
+          "paid",
+          248
+        ],
+        [
+          "vip",
+          "pending",
+          180
+        ],
+        [
+          "vip",
+          "refunded",
+          72
+        ],
+        [
+          "vip",
+          "shipped",
+          211
+        ],
+        [
+          "wholesale",
+          "cancelled",
+          315
+        ],
+        [
+          "wholesale",
+          "completed",
+          2216
+        ],
+        [
+          "wholesale",
+          "paid",
+          519
+        ],
+        [
+          "wholesale",
+          "pending",
+          391
+        ],
+        [
+          "wholesale",
+          "refunded",
+          163
+        ],
+        [
+          "wholesale",
+          "shipped",
+          436
+        ]
+      ],
+      "reference": [
+        [
+          "retail",
+          "cancelled",
+          1082
+        ],
+        [
+          "retail",
+          "completed",
+          7715
+        ],
+        [
+          "retail",
+          "paid",
+          1726
+        ],
+        [
+          "retail",
+          "pending",
+          1298
+        ],
+        [
+          "retail",
+          "refunded",
+          574
+        ],
+        [
+          "retail",
+          "shipped",
+          1714
+        ],
+        [
+          "vip",
+          "cancelled",
+          153
+        ],
+        [
+          "vip",
+          "completed",
+          987
+        ],
+        [
+          "vip",
+          "paid",
+          248
+        ],
+        [
+          "vip",
+          "pending",
+          180
+        ],
+        [
+          "vip",
+          "refunded",
+          72
+        ],
+        [
+          "vip",
+          "shipped",
+          211
+        ],
+        [
+          "wholesale",
+          "cancelled",
+          315
+        ],
+        [
+          "wholesale",
+          "completed",
+          2216
+        ],
+        [
+          "wholesale",
+          "paid",
+          519
+        ],
+        [
+          "wholesale",
+          "pending",
+          391
+        ],
+        [
+          "wholesale",
+          "refunded",
+          163
+        ],
+        [
+          "wholesale",
+          "shipped",
+          436
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Số đơn theo segment khách và status đơn, toàn kỳ; trả segment,status,n, xếp segment rồi status.",
+      "gold_sql": "SELECT c.segment,o.status,COUNT(*) AS n FROM customers c JOIN orders o ON o.customer_id=c.customer_id GROUP BY c.segment,o.status ORDER BY c.segment,o.status"
+    },
+    {
+      "id": "test_30",
+      "family": "payment_order_gap",
+      "split": "test",
+      "python_match": true,
+      "gold": [
+        [
+          69
+        ]
+      ],
+      "reference": [
+        [
+          69
+        ]
+      ],
+      "policy_allowed": true,
+      "policy_preserves_result": true,
+      "empty_result": false,
+      "scalar_zero_or_null": false,
+      "question": "Trong payment succeeded quý 2/2026 theo paid_at, bao nhiêu payment thuộc đơn đặt trước quý 2?",
+      "gold_sql": "SELECT COUNT(*) AS n FROM payments p JOIN orders o ON o.order_id=p.order_id WHERE p.status='succeeded' AND p.paid_at >= '2026-04-01' AND p.paid_at < '2026-07-01' AND o.created_at < '2026-04-01'"
+    }
+  ],
+  "edge_checks": [
+    {
+      "id": "test_08",
+      "check": "Unsold product present alongside a repeatedly sold product",
+      "expected": [
+        [
+          2
+        ]
+      ],
+      "actual": [
+        [
+          2
+        ]
+      ],
+      "pass": true,
+      "mutant_rejected": true,
+      "mutation": [
+        "NOT EXISTS",
+        "EXISTS"
+      ],
+      "mutant_result": [
+        [
+          1
+        ]
+      ]
+    },
+    {
+      "id": "test_13",
+      "check": "Active unreviewed included; inactive unreviewed excluded",
+      "expected": [
+        [
+          2
+        ]
+      ],
+      "actual": [
+        [
+          2
+        ]
+      ],
+      "pass": true,
+      "mutant_rejected": true,
+      "mutation": [
+        "p.is_active=TRUE",
+        "p.is_active=FALSE"
+      ],
+      "mutant_result": [
+        [
+          1
+        ]
+      ]
+    },
+    {
+      "id": "test_23",
+      "check": "Equal order amounts use ascending ID; cancelled excluded",
+      "expected": [
+        [
+          2,
+          200
+        ],
+        [
+          1,
+          100
+        ],
+        [
+          3,
+          100
+        ]
+      ],
+      "actual": [
+        [
+          2,
+          200
+        ],
+        [
+          1,
+          100
+        ],
+        [
+          3,
+          100
+        ]
+      ],
+      "pass": true,
+      "mutant_rejected": true,
+      "mutation": [
+        "order_id LIMIT",
+        "order_id DESC LIMIT"
+      ],
+      "mutant_result": [
+        [
+          2,
+          200
+        ],
+        [
+          3,
+          100
+        ],
+        [
+          1,
+          100
+        ]
+      ]
+    },
+    {
+      "id": "test_04",
+      "check": "AOV counts an order once despite two succeeded payments",
+      "expected": [
+        [
+          "web",
+          200.0
+        ]
+      ],
+      "actual": [
+        [
+          "web",
+          200.0
+        ]
+      ],
+      "pass": true,
+      "mutant_rejected": true,
+      "mutation": [
+        "AVG(o.total_amount)",
+        "SUM(o.total_amount)"
+      ],
+      "mutant_result": [
+        [
+          "web",
+          400.0
+        ]
+      ]
+    },
+    {
+      "id": "test_11",
+      "check": "Keep active suppliers with zero active products",
+      "expected": [
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "actual": [
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "pass": true,
+      "mutant_rejected": true,
+      "mutation": [
+        "COUNT(p.product_id)",
+        "COUNT(*)"
+      ],
+      "mutant_result": [
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "test_18",
+      "check": "Exactly five days excluded; one second above included; NULL excluded",
+      "expected": [
+        [
+          1
+        ]
+      ],
+      "actual": [
+        [
+          1
+        ]
+      ],
+      "pass": true,
+      "mutant_rejected": true,
+      "mutation": [
+        "> 5",
+        ">= 5"
+      ],
+      "mutant_result": [
+        [
+          2
+        ]
+      ]
+    },
+    {
+      "id": "test_27",
+      "check": "Both channels required; repeated web and cancelled app do not qualify",
+      "expected": [
+        [
+          1
+        ]
+      ],
+      "actual": [
+        [
+          1
+        ]
+      ],
+      "pass": true,
+      "mutant_rejected": true,
+      "mutation": [
+        "COUNT(DISTINCT channel)",
+        "COUNT(channel)"
+      ],
+      "mutant_result": [
+        [
+          2
+        ]
+      ]
+    },
+    {
+      "id": "test_22",
+      "check": "Ratio of sums, not mean of per-order percentages",
+      "expected": [
+        [
+          46.36
+        ]
+      ],
+      "actual": [
+        [
+          46.36
+        ]
+      ],
+      "pass": true,
+      "mutant_rejected": true,
+      "mutation": [
+        "SUM(total_amount+discount)",
+        "SUM(total_amount)"
+      ],
+      "mutant_result": [
+        [
+          86.44
+        ]
+      ]
+    },
+    {
+      "id": "test_20",
+      "check": "Two city addresses for same customer count once",
+      "expected": [
+        [
+          2
+        ]
+      ],
+      "actual": [
+        [
+          2
+        ]
+      ],
+      "pass": true,
+      "mutant_rejected": true,
+      "mutation": [
+        "COUNT(DISTINCT customer_id)",
+        "COUNT(customer_id)"
+      ],
+      "mutant_result": [
+        [
+          3
+        ]
+      ]
+    },
+    {
+      "id": "test_28",
+      "check": "Zero quantity still counts as a warehouse; duplicate warehouse does not",
+      "expected": [
+        [
+          1
+        ]
+      ],
+      "actual": [
+        [
+          1
+        ]
+      ],
+      "pass": true,
+      "mutant_rejected": true,
+      "mutation": [
+        "COUNT(DISTINCT warehouse)",
+        "COUNT(warehouse)"
+      ],
+      "mutant_result": [
+        [
+          2
+        ]
+      ]
+    },
+    {
+      "id": "test_10",
+      "check": "Only products with inventory rows; sum across every warehouse",
+      "expected": [
+        [
+          1
+        ]
+      ],
+      "actual": [
+        [
+          1
+        ]
+      ],
+      "pass": true,
+      "mutant_rejected": true,
+      "mutation": [
+        "SUM(quantity)=0",
+        "MIN(quantity)=0"
+      ],
+      "mutant_result": [
+        [
+          1
+        ],
+        [
+          2
+        ]
+      ]
+    },
+    {
+      "id": "test_30",
+      "check": "Payment quarter and order date are different filters",
+      "expected": [
+        [
+          1
+        ]
+      ],
+      "actual": [
+        [
+          1
+        ]
+      ],
+      "pass": true,
+      "mutant_rejected": true,
+      "mutation": [
+        "o.created_at <",
+        "o.created_at <="
+      ],
+      "mutant_result": [
+        [
+          2
+        ]
+      ]
+    }
+  ]
+}

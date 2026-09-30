@@ -24,6 +24,7 @@ help:
 	@echo "seed          run db/seed.py against DATABASE_URL (no-op with a message if unset)"
 	@echo "demo-offline  run the agent loop on the 5 seed questions, OFFLINE_MODE=1"
 	@echo "smoke         offline eval on the 5 seed items -> eval/results/<run_id>/summary.md"
+	@echo "validate-local  gold SQL vs Python references on two real SQLite snapshots; no LLM"
 	@echo "test          pytest (offline; no DB, no network)"
 	@echo "lint          ruff check + format check"
 	@echo "run-api       uvicorn t2sql.api.main:app --reload"
@@ -44,7 +45,12 @@ seed:
 # --offline sets OFFLINE_MODE=1 from inside Python, so these targets need no shell-specific
 # env-var prefix and behave identically on Windows cmd, PowerShell and POSIX shells.
 demo-offline:
-	$(PY) -m t2sql.agent.demo --offline
+	$(PY) -m eval.harness.runner --demo --offline
+
+# Executes generated gold SQL against SQLite; never calls a model or replays SQL fixtures.
+.PHONY: validate-local
+validate-local:
+	$(PY) -m eval.harness.local_validation
 
 smoke:
 	$(PY) -m eval.harness.runner --config eval/configs/baseline.yaml --offline

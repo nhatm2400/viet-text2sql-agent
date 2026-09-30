@@ -3,7 +3,8 @@
 **No dataset file is ever committed to this repository.** This directory contains download
 scripts only. Everything they fetch lands in `data/external/`, which is git-ignored.
 
-The scripts in this directory were **not executed** while scaffolding the repo.
+The scripts were not executed while scaffolding the repo. On 2026-10-01 the ViText2SQL
+downloader was implemented and run locally. The separate Spider-subset downloader remains a stub.
 
 ## Why the pins matter
 
@@ -31,6 +32,28 @@ headline figure — the settings differ.
   This project's setting is Vietnamese questions over an **English** schema, so results on this
   subset are a related-but-different measurement and are labelled as such.
 - Pinned to: `VERSION_TAG` in `download_vitext2sql.py`.
+
+### Implemented local integration (2026-10-01)
+
+`download_vitext2sql` pins VinAI commit `e759141d891feb794bb9a9fb912d544b25583b3c`
+and the official Spider archive SHA-256. `prepare_vitext2sql` pairs Vietnamese questions
+with original English-schema Spider SQL by exact database ID and SQL AST, **including
+literal values**. Table/column index layouts, types, PKs and FKs must also match.
+It checks all reference-query variants on the original database; incompatible annotations
+and failing gold SQL remain in an exclusion ledger produced before model inference.
+
+This is explicitly an **adapted ViText2SQL-question / Spider-English-schema subset**,
+not the unmodified ViText2SQL benchmark, official Spider scoring, or a leaderboard submission.
+Programmatic validation does not satisfy independent human sample review. Until that review,
+pilot and larger runs are labelled preliminary/unreviewed; do not call them human-reviewed.
+The original source paper describes human translation; our adaptation has not been human-audited.
+
+The current source commit contains 954 dev and 1,908 test questions (the 2020 paper reports
+1,906 test questions). Eligible packages currently contain 898 dev questions / 25 databases
+and 1,618 test questions / 42 databases; report these actual subset denominators, never 1,000
+or the full source count unless those questions were really evaluated.
+
+See [the Vietnamese workflow and measured pilot](../../../docs/VITEXT2SQL_LOCAL_EVAL.vi.md).
 
 ## Spider 1.0 (dev subset)
 

@@ -11,6 +11,7 @@ Everything here is a plain function over a list of item dicts. Two rules:
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
+from math import ceil
 from statistics import mean
 from typing import Any
 
@@ -24,7 +25,9 @@ def percentile(values: list[float], p: float) -> float | None:
     if not values:
         return None
     ordered = sorted(values)
-    index = max(0, min(len(ordered) - 1, int(round(p / 100.0 * len(ordered) + 0.5)) - 1))
+    if not 0 <= p <= 100:
+        raise ValueError("percentile must be between 0 and 100")
+    index = max(0, min(len(ordered) - 1, ceil(p / 100.0 * len(ordered)) - 1))
     return round(ordered[index], 2)
 
 
@@ -78,14 +81,11 @@ def aggregate(items: list[dict[str, Any]]) -> RunMetrics:
 
     # First pass = the first execute_sql call succeeded. Self-correction = it did not, but a
     # later one did. The second denominator is only the items that actually needed recovery.
-    needed_recovery = [i for i in items if i.get("execute_failures", 0) > 0]
+    attempted = [i for i in items if i.get("execute_statuses")]
+    needed_recovery = [i for i in attempted if i["execute_statuses"][0] != "ok"]
     metrics.first_pass_success_rate = _pct(
-        sum(
-            1
-            for i in items
-            if i.get("execute_attempts", 0) > 0 and i.get("execute_failures", 0) == 0
-        ),
-        sum(1 for i in items if i.get("execute_attempts", 0) > 0),
+        sum(1 for i in attempted if i["execute_statuses"][0] == "ok"),
+        len(attempted),
     )
     metrics.self_correction_success_rate = _pct(
         sum(1 for i in needed_recovery if i.get("status") == "executed"), len(needed_recovery)

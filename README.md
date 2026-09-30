@@ -8,11 +8,38 @@ than by prompt wording.
 > **Status: scaffold (v0.1.0).** The security core, the scoring functions and the offline agent
 > loop are implemented and tested. Retrieval, the repair loop and the Vietnamese
 > time-expression resolver are typed stubs marked `TODO(phase2)`.
-> **No performance number is published in this repo until `make eval` has measured it.**
+> **Every performance number is tied to a recorded evaluation run.**
 > Every `[TBD]` below is a placeholder, not a result.
+
+**Local validation milestone (2026-09-29):** 30 development cases (10 query families × 3
+regions), checked against Python reference calculations on two newly generated SQLite snapshots.
+All 60 case/snapshot pairs matched; both scorers rejected all 60 deliberately incorrect query
+results. This measures **gold SQL and scorer validation, not LLM accuracy**. The suite is
+AI-authored and still needs independent human review. Full results, limitations, five project
+questions and CV wording: [docs/LOCAL_EVAL_AND_CV.vi.md](docs/LOCAL_EVAL_AND_CV.vi.md).
+
+```powershell
+.venv/Scripts/python.exe -m eval.harness.local_validation
+```
+
+Equivalent: `make validate-local`. No keys, network, containers, replayed result sets, or
+existing database required. Each run creates fresh in-memory databases and a new report under
+`eval/results/`, including source/snapshot hashes and all per-case results.
 
 Full context: [docs/PROPOSAL.md](docs/PROPOSAL.md) · security model: [docs/SECURITY.md](docs/SECURITY.md) ·
 undocumented choices: [docs/DECISIONS.md](docs/DECISIONS.md).
+
+**Live local evaluation:** [setup, snapshot v2, review and paired model evaluation](docs/LIVE_LOCAL_EVAL.vi.md).
+The new `eval.harness.live_local` runner calls a local Ollama model for a single-pass baseline
+and a bounded LangGraph SQL agent. Development labels remain provisional; test evaluation requires
+human review and a frozen package. This path evaluates SQLite-native SQL, not PostgreSQL accuracy.
+
+**External benchmark integration (2026-10-01):** a separate local runner supports multiple
+SQLite databases and resumable evaluation of adapted ViText2SQL questions over original
+Spider English schemas. Preflight produced 898 eligible dev questions across 25 databases
+and 1,618 eligible test questions across 42 databases, with explicit exclusion ledgers.
+These are package sizes, not completed model-evaluation counts or official benchmark scores.
+See [the protocol, pilot and commands](docs/VITEXT2SQL_LOCAL_EVAL.vi.md).
 
 🇻🇳 **Tiếng Việt:** [docs/PROPOSAL.vi.md](docs/PROPOSAL.vi.md) — bản dịch đề án, **cộng một mục
 hướng dẫn đọc repo giải thích từng thư mục và file đang làm gì**. Nếu bạn mới tiếp cận dự án, bắt
@@ -142,7 +169,44 @@ redistribution; `data/` is git-ignored and the download scripts print the licenc
 
 ### Results
 
-**Nothing has been measured yet.** This table is filled in by `make eval`, one row per run
+**Latest timestamp-window experiment:** adding shared half-open calendar-window guidance at
+the same 4,096-token budget raised baseline strict/relaxed EX from **70% to 80% (16/20)**
+and agent EX from **75% to 80% (16/20)** on the fixed synthetic development split.
+Both revenue questions now pass; no questions regressed. The two strategies have equal EX;
+agent p95 is 92.97 seconds versus baseline 79.61 seconds. This is one development run per
+configuration, not human-reviewed test accuracy or PostgreSQL evaluation. See the
+[date-window comparison, evidence and CV wording](docs/DATE_WINDOW_RESULTS.vi.md).
+
+**Earlier schema-context experiment:** adding 8 CHECK predicates from the schema at a fixed
+4,096-token output budget raised baseline strict/relaxed EX from **65% to 70% (14/20)**
+and agent EX from **65% to 75% (15/20)** on the same synthetic development split.
+Both strategies recovered two cancellation questions but regressed on one revenue question;
+the agent additionally recovered the other revenue question. Agent p95 is 96.44 seconds.
+See the [schema comparison, limitations and CV wording](docs/SCHEMA_CHECK_RESULTS.vi.md).
+
+**Earlier output-budget experiment:** increasing Qwen3 4B from 2,048 to 4,096 output tokens
+raised both strategies from **12/20 (60%) to 13/20 (65%) strict and relaxed EX** on the same
+synthetic development split. Baseline/agent p95 rose from 39.17/40.22 seconds to
+80.06/85.94 seconds. Both strategies recovered one question; several other failures became
+executable but incorrect SQL. See the [paired comparison and evidence](docs/TOKEN_BUDGET_RESULTS.vi.md).
+
+**Preliminary local model result:** Qwen3 4B achieved **12/20 (60%) strict and relaxed EX**
+for both single-pass SQL and the bounded LangGraph agent on AI-authored development questions
+over a synthetic SQLite snapshot. This is not a human-reviewed test result or a PostgreSQL
+evaluation. Eight questions per strategy exhausted the 2,048-token output budget before
+producing SQL; all failures remain in the denominator. See the
+[measured results, evidence and CV wording](docs/LOCAL_MODEL_RESULTS.vi.md).
+The local gold-query validation milestone above is separate.
+
+An additional [AI review of all 50 candidate gold queries](docs/AI_REVIEW_RESULTS.vi.md)
+matched Python reference calculations on the fixed snapshot (50/50), checked 12 semantic
+edge cases, and rejected 12 executable SQL mutations. This validates selected gold-query
+behavior, not model accuracy or human annotation. A separate revised package clarifies
+the zero-inventory question while preserving the original evaluation package.
+The ablation YAML files are design placeholders: the current runner does not apply model tier,
+context strategy, example selection, repair switches, or the date anchor as specified there.
+Do not use these files to claim an ablation result until that wiring is implemented and tested.
+This table is intended for `make eval`, one row per run
 configuration, with dataset size, split and scoring rule stated alongside — per the proposal's
 honest-reporting rule.
 

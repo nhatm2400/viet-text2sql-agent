@@ -141,6 +141,7 @@ def run_item(item: dict[str, Any], gold_executor: GoldExecutor, cap: int) -> dic
         latency_ms=run.get("latency_ms"),
         trace_id=run.get("trace_id"),
         execute_attempts=len(executes),
+        execute_statuses=[c["result"].get("status") for c in executes],
         execute_failures=sum(1 for c in executes if c["result"].get("status") != "ok"),
         chart_proposed=bool(charts),
         chart_valid=any(c["result"].get("status") == "ok" for c in charts),
