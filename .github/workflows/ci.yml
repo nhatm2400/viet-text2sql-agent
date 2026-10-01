@@ -172,7 +172,8 @@ jobs:
   # ---------------------------------------------------------------------------
   deploy:
     needs: [lint, test, security]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    # Local demo checkouts need no VPS. Opt in only after configuring deployment secrets.
+    if: vars.DEPLOY_ENABLED == 'true' && github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     environment:
       name: production

@@ -270,6 +270,11 @@ tempting and what was done instead.
   (SSH, main only; no image build, no registry). GitHub-hosted runners are VMs, not containers,
   so there is no container anywhere in the loop.
 
+VPS deployment is opt-in: set the repository Actions variable `DEPLOY_ENABLED=true` after
+configuring `SSH_PRIVATE_KEY`, `SSH_KNOWN_HOSTS`, `VPS_HOST`, and `VPS_USER`. With deployment
+disabled, pushes still run lint, tests, and security checks and skip the VPS job. The local
+PostgreSQL/Ollama demo does not require a VPS.
+
 Tracing is self-built: every tool call is written to a plain `agent_traces` Postgres table
 ([db/traces.sql](db/traces.sql)) and read back by the Streamlit "Traces" tab. Langfuse **Cloud**
 is optional enrichment when `LANGFUSE_PUBLIC_KEY` is set — never required.

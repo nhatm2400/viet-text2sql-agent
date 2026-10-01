@@ -72,6 +72,10 @@ gồm **11 kiểm tra PostgreSQL thật**; ruff check và format đạt trên 75
 Model trong tests là fixtures; live model requests được kiểm chứng riêng bên dưới.
 Report JUnit cục bộ: `data/postgres_local/tests.xml`.
 
+GitHub CI đã pass lint/test/security trên commit demo. Job deploy VPS từng lỗi tại bước
+`Deploy and verify`; việc triển khai từ nay chỉ chạy khi Actions variable
+`DEPLOY_ENABLED=true` và đã cấu hình các SSH/VPS secrets. Demo local không cần VPS.
+
 [API demo và tool traces](evidence/local-postgres-demo-20261002.json): câu đếm orders tháng
 6/2026 trả **2.351**, khớp truy vấn reference; câu “khách hàng active” gọi glossary rồi
 ask_clarification; yêu cầu DROP được Qwen từ chối mà không thực thi SQL. Câu trả lời
