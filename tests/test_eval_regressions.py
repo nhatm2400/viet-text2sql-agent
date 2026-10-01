@@ -61,6 +61,15 @@ def test_first_pass_uses_first_attempt_not_all_attempts():
     assert metrics.self_correction_success_rate == 50
 
 
+def test_text_only_reply_is_neither_execution_nor_policy_block():
+    state = {"messages": [AIMessage(content="I cannot run DROP TABLE.")], "iteration_count": 0}
+    result = summarise(state, 6)
+    assert result["status"] == "answered"
+    assert result["sql"] is None
+    assert result["rows"] == []
+    assert result["blocked_reasons"] == []
+
+
 def test_missing_attempt_order_is_not_invented():
     metrics = aggregate([{"execute_attempts": 2, "execute_failures": 1, "status": "executed"}])
     assert metrics.first_pass_success_rate is None

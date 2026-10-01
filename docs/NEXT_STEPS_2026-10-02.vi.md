@@ -1,5 +1,36 @@
 # Kế hoạch ngày 02/10/2026
 
+**Đã làm thêm ngày 02/10 theo yêu cầu làm đủ bốn phần:**
+
+- README cập nhật **61,0% strict / 72,6% relaxed trên 500 câu, 15 database**, links evidence
+  và giới hạn adapted prefix; bỏ khẳng định human review chưa được xác nhận.
+- Native `ollama_local` dùng chung cho UI/API; PostgreSQL portable 17.11 trên loopback
+  55432, dữ liệu synthetic v2 12 bảng. SELECT, clarification và từ chối DROP đã chạy qua
+  API thật; Streamlit runtime cũng trả đúng 2.351 orders. [Demo](LOCAL_POSTGRES_DEMO.vi.md).
+- Full regression **182 passed, 0 skipped**, gồm 11 role/timeout kiểm tra trên PostgreSQL
+  thật; lint/format đạt. Sửa SET session timeout để không mất khi pool rollback khởi tạo.
+- Replay và phân loại đủ **195 strict misses**; chi tiết có giấy phép hạn chế ở thư mục
+  ignored, chỉ aggregate đưa vào Git. [Phân tích](ERROR_ANALYSIS_500.vi.md).
+
+Eval vẫn dừng ở 500. Code app mới khác frozen source của run; không resume bằng checkout
+mới hay sửa hash. Task tiếp theo là tối ưu trên development và đánh giá tập mới giữ riêng,
+cùng independent human sample audit khi có người review. Nội dung kế hoạch phía dưới là
+**lịch sử trước khi chốt 500**, không phải danh sách việc còn phải thực hiện hôm nay.
+
+**Cập nhật 02/10:** người dùng yêu cầu chạy tới khoảng 500 câu rồi dừng và đánh giá xem
+đã đủ để ghi CV chưa. Đã dừng ở đúng 500, worker thoát; replay xác nhận **61,0% strict**,
+**72,6% relaxed**, 15 database và 332 cặp database–SQL AST. Báo cáo/câu CV đã lưu tại
+[EVAL_500_RESULTS.vi.md](EVAL_500_RESULTS.vi.md). Không tự tiếp tục 1.118 câu còn lại.
+
+**Cập nhật 01/10:** runner đã kiểm chứng; agent đã tạm dừng ở **124/1.618 câu**, sau đó
+resume lúc **14:18**, rồi tạm dừng theo yêu cầu ở **302/1.618 câu**; worker đã thoát,
+checkpoint giữ nguyên. Đã resume lại lúc **20:12** từ 302 câu với phiên tối đa 5 tiếng,
+không đổi cấu hình; sau đó tạm dừng theo yêu cầu ở **490/1.618 câu**, còn **1.128 câu**,
+worker đã thoát và checkpoint được giữ.
+Trạng thái/đường dẫn resume:
+[ACTIVE_EVAL_2026-10-01.vi.md](ACTIVE_EVAL_2026-10-01.vi.md). Nội dung dưới là kế hoạch
+và snapshot lúc tạm dừng trước đó.
+
 Task được tạm dừng theo yêu cầu người dùng ngày 01/10. Không có tiến trình live eval
 của repo đang chạy; chưa khởi động lượt model trên adapted test split.
 

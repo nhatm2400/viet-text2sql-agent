@@ -5,11 +5,27 @@ A bilingual **Vietnamese question → English schema** Text-to-SQL analytics age
 optimised, and the security guarantees are enforced by the database and an AST policy rather
 than by prompt wording.
 
-> **Status: scaffold (v0.1.0).** The security core, the scoring functions and the offline agent
-> loop are implemented and tested. Retrieval, the repair loop and the Vietnamese
-> time-expression resolver are typed stubs marked `TODO(phase2)`.
+> **Status: local prototype (v0.1.0).** The bounded LangGraph agent supports native local
+> Ollama, PostgreSQL execution, SQL AST validation, clarification, and tool traces.
+> Example retrieval remains a stub. Calendar-window guidance is implemented.
 > **Every performance number is tied to a recorded evaluation run.**
 > Every `[TBD]` below is a placeholder, not a result.
+
+**Latest measured model result (2026-10-02): Qwen3 4B reached 61.0% strict execution
+accuracy (305/500) and 72.6% relaxed accuracy (363/500)** on 500 adapted Vietnamese
+ViText2SQL questions across 15 original Spider SQLite databases. This is a completed
+source-order prefix of a larger eligible test package, with 332 distinct database/SQL-AST
+pairs. It is not a random sample or an official ViText2SQL score; independent human audit
+of the adaptation is pending. All 500 predictions remain in the denominator.
+[Results and CV wording](docs/EVAL_500_RESULTS.vi.md) ·
+[replay-verified aggregate evidence](docs/evidence/vitext2sql-prefix-500-20261002.json) ·
+[195-failure analysis](docs/ERROR_ANALYSIS_500.vi.md).
+
+**Live demo:** [free local Qwen + real PostgreSQL setup and commands](docs/LOCAL_POSTGRES_DEMO.vi.md).
+This synthetic 12-table PostgreSQL demo is separate from the 500-question SQLite evaluation.
+Local verification: **182 tests passed, zero skipped**, including 11 checks against real
+PostgreSQL; API and Streamlit runtime also exercised local Qwen on the synthetic database.
+Example retrieval remains unfinished; these checks do not establish production readiness.
 
 **Local validation milestone (2026-09-29):** 30 development cases (10 query families × 3
 regions), checked against Python reference calculations on two newly generated SQLite snapshots.
@@ -79,13 +95,21 @@ compatible ranges. Regenerate the lock with `make lock`.
 `make eval` (no `--offline`) deliberately **refuses** to run while `OFFLINE_MODE=1`: replaying
 fixtures and calling the output a measurement is how a results table starts lying.
 
-Interactive use (needs a live database and model keys):
+Interactive use with a provider and PostgreSQL connection:
 
 ```bash
 cp .env.example .env       # fill in MODEL_PROVIDER + key, DATABASE_URL_RO, set OFFLINE_MODE=0
 make seed                  # deterministic synthetic data
 make run-api               # uvicorn on :8000
 make run-ui                # streamlit on :8501
+```
+
+For the configured free Windows local demo, use:
+
+```powershell
+.venv/Scripts/python.exe -m scripts.run_local_demo api
+# In another terminal:
+.venv/Scripts/python.exe -m scripts.run_local_demo ui
 ```
 
 ---
@@ -149,25 +173,33 @@ How we score:
 3. Ignore row order **unless** the gold SQL has a top-level `ORDER BY`.
 4. **Strict EX** — exact multiset match with column order enforced.
    **Relaxed EX** — extra predicted columns tolerated, columns matched by canonical name or value.
-5. Both metrics recorded per item; execution-vs-structure disagreements are adjudicated by hand and logged.
-6. Every gold query is executed and human-reviewed before entering the dataset; external subsets
-   are version-pinned and sample-audited (see the 2026 annotation-error findings in the proposal).
+5. Both metrics are recorded per item. Observed failures and SQL structure differences can be
+   replayed and classified; this does not establish their semantic root cause.
+6. Gold queries are executed during package preparation. Synthetic labels are AI-authored;
+   independent human review remains pending. External packages are version-pinned and
+   programmatically aligned. Do not describe these checks as completed human review.
 
 Known limitation, stated openly: execution accuracy has false positives (wrong SQL that happens
-to match on this snapshot) and false negatives. The strict/relaxed pair plus manual adjudication
-bounds this; it does not eliminate it.
+to match on this snapshot) and false negatives. Reporting both scores makes projection
+disagreements visible; independent semantic review and additional snapshots are still needed.
 
 | Dataset | Size now | Target | Location |
 |---|---|---|---|
 | `core_vi` | 5 | 80–120 | [eval/datasets/core_vi/questions.jsonl](eval/datasets/core_vi/questions.jsonl) |
 | `security` | 10 | 50–100 | [eval/datasets/security/attacks.jsonl](eval/datasets/security/attacks.jsonl) |
 | `paraphrase` | 0 | 20–30 pairs | [eval/datasets/paraphrase/pairs.jsonl](eval/datasets/paraphrase/pairs.jsonl) |
-| ViText2SQL / Spider | — | ~100 each | download scripts only, [eval/datasets/external/](eval/datasets/external/) |
+| Adapted ViText2SQL / Spider | 500 evaluated / 1,618 eligible test | paused at 500 | [protocol](docs/VITEXT2SQL_LOCAL_EVAL.vi.md); raw data ignored |
 
 External datasets are **never committed**. ViText2SQL is research/education licensed with no
 redistribution; `data/` is git-ignored and the download scripts print the licence first.
 
 ### Results
+
+**Latest larger evaluation:** 500/500 requested prefix predictions completed; strict
+**305/500 (61.0%)**, relaxed **363/500 (72.6%)**, 15 SQLite databases, Qwen3 4B Q4_K_M.
+The larger 1,618-question run remains incomplete. Median/p95 latency: **58.43/108.78 seconds**.
+Nonempty-gold strict accuracy is **298/493 (60.45%)**; seven empty-gold cases all matched.
+See [protocol, limitations and frozen evidence](docs/EVAL_500_RESULTS.vi.md).
 
 **Latest timestamp-window experiment:** adding shared half-open calendar-window guidance at
 the same 4,096-token budget raised baseline strict/relaxed EX from **70% to 80% (16/20)**

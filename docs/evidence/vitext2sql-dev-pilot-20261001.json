@@ -1,0 +1,113 @@
+{
+  "label": "technical-pilot-unreviewed-adapted-benchmark",
+  "setting": "Adapted ViText2SQL Vietnamese questions with original Spider English schemas and values",
+  "split": "dev",
+  "not_official_vitext2sql_or_spider_score": true,
+  "review": "Programmatic alignment and execution replay; independent human audit pending",
+  "population": {
+    "source_questions": 954,
+    "ast_aligned_questions": 902,
+    "eligible_questions": 898,
+    "excluded_questions": 56,
+    "eligible_databases": 25,
+    "eligible_empty_gold": 15,
+    "evaluated_questions": 4,
+    "evaluated_databases": 4,
+    "distinct_database_ast_pairs": 4
+  },
+  "model": "qwen3:4b",
+  "model_digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+  "api_version": {
+    "version": "0.34.4"
+  },
+  "model_options": {
+    "num_predict": 4096,
+    "temperature": 0,
+    "seed": 42,
+    "num_ctx": 8192,
+    "think": true
+  },
+  "runtime": "Not captured by the historical pilot runner",
+  "scoring": "repository strict/relaxed execution agreement, not official leaderboard scoring",
+  "execution": "native SQLite SELECT; read-only authorizer; no business allowlist or LIMIT rewriting; 5s SQL deadline, 100000-row failure cap",
+  "summary": {
+    "complete": true,
+    "selection": "fixed-seed-cross-database-pilot",
+    "source_count": 954,
+    "eligible_count": 898,
+    "selected_questions": 4,
+    "completed_predictions": 8,
+    "expected_predictions": 8,
+    "metrics": {
+      "baseline": {
+        "n": 4,
+        "strict_correct": 2,
+        "relaxed_correct": 2,
+        "strict_ex": 50.0,
+        "relaxed_ex": 50.0,
+        "items_with_output_cap_hit": 2,
+        "no_successful_sql": 2,
+        "p50_ms": 33434.97,
+        "p95_ms": 78262.29,
+        "avg_tokens": 2981.25,
+        "nonempty_gold": {
+          "n": 4,
+          "strict_correct": 2,
+          "relaxed_correct": 2,
+          "strict_ex": 50.0,
+          "relaxed_ex": 50.0,
+          "items_with_output_cap_hit": 2,
+          "no_successful_sql": 2,
+          "p50_ms": 33434.97,
+          "p95_ms": 78262.29,
+          "avg_tokens": 2981.25
+        },
+        "empty_gold_questions": 0
+      },
+      "agent": {
+        "n": 4,
+        "strict_correct": 3,
+        "relaxed_correct": 3,
+        "strict_ex": 75.0,
+        "relaxed_ex": 75.0,
+        "items_with_output_cap_hit": 1,
+        "no_successful_sql": 1,
+        "p50_ms": 48763.32,
+        "p95_ms": 79157.52,
+        "avg_tokens": 3942.0,
+        "nonempty_gold": {
+          "n": 4,
+          "strict_correct": 3,
+          "relaxed_correct": 3,
+          "strict_ex": 75.0,
+          "relaxed_ex": 75.0,
+          "items_with_output_cap_hit": 1,
+          "no_successful_sql": 1,
+          "p50_ms": 48763.32,
+          "p95_ms": 79157.52,
+          "avg_tokens": 3942.0
+        },
+        "empty_gold_questions": 0
+      }
+    }
+  },
+  "evidence_sha256": {
+    "config.json": "da4e7852f0b528cab43f83b532f30c515e56efe117a4e55a0a5876c48ff66804",
+    "items.jsonl": "3264168ca43c3c8c574074314bef5caa4fb872c3dc098c9643eb3066a8654902",
+    "summary.json": "8c27e9f3657529b1e09b44ee4e35be2d79e84716223d23cbcc9d4c73a0873235"
+  },
+  "manifest_sha256": "f5b1c54d7146761eff1a8be04765fb0df3454cb8dc02349b53ac86be2e785be4",
+  "questions_sha256": "5033b7e431837d564638b8acf32c50c311c24ea3525e6a17c9d85f8623a23f79",
+  "exclusions_sha256": "f15de1bc9ae36d73019c16322d91cdde04386a087ad5ca535f6ff7e8d4c23366",
+  "source_sha256": {
+    "eval/harness/live_vitext2sql.py": "180cbc501a15b185804e163973717dba04c0d2a184475c90378b216c985a943b",
+    "eval/harness/sqlite_readonly.py": "e03f5542b759ebddf0f48b67b1315ce54052b49dff89514f937a06eb27c4d141",
+    "eval/harness/scoring.py": "22855f130d1ea5a842649f454483678973d06b8c44f6e98cacf11bc083e3c482",
+    "eval/harness/compare_local.py": "ac845863d3f6decf140941afecb135fa7b90572e9051838f4e7f16456ce7e210",
+    "eval/harness/live_local.py": "61b68ecb48201cf28e9e4957131bb8b76ea536933000a1b8e6d90deccaaf8b67",
+    "src/t2sql/agent/prompts.py": "a6c1b2f69b9592c7b2f0a19f50814b506144e080da468f231407f2ca32238d33",
+    "src/t2sql/agent/build.py": "a9b1a36d120c82bfa057d8d132a4edb45f488ab4944978aa7c5f26b6897e0ce2",
+    "src/t2sql/llm/ollama_local.py": "7a5c0be2aec79177993b6040823e65acc764e713bfedfd4f266f1c6d5552e529"
+  },
+  "limitations": "Adapted eligible subset, English Spider schemas; one database snapshot per question; repeated SQL structures; no independent human audit; not an official leaderboard score. Pilot results do not estimate full-test accuracy."
+}

@@ -133,9 +133,16 @@ def _readonly_engine(url: str) -> Any:
 
             @event.listens_for(engine, "connect")
             def _set_session_limits(dbapi_conn, _record):  # pragma: no cover - needs a live DB
-                with dbapi_conn.cursor() as cur:
-                    cur.execute(f"SET statement_timeout = {settings.statement_timeout_ms}")
-                    cur.execute("SET default_transaction_read_only = on")
+                # Persist session defaults outside a transaction. SQLAlchemy rolls back
+                # during connection initialization; transactional SET would be lost.
+                previous = dbapi_conn.autocommit
+                dbapi_conn.autocommit = True
+                try:
+                    with dbapi_conn.cursor() as cur:
+                        cur.execute(f"SET statement_timeout = {int(settings.statement_timeout_ms)}")
+                        cur.execute("SET default_transaction_read_only = on")
+                finally:
+                    dbapi_conn.autocommit = previous
 
         _RO_ENGINES[url] = engine
     return _RO_ENGINES[url]

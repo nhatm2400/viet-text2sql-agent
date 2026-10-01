@@ -16,7 +16,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]  # src/t2sql/config.py -> repo r
 PACKAGE_ROOT = Path(__file__).resolve().parent
 
 ModelRole = Literal["fast", "strong"]
-ModelProvider = Literal["anthropic", "openai_compatible", "bedrock"]
+ModelProvider = Literal["anthropic", "openai_compatible", "bedrock", "ollama_local"]
 
 
 class Settings(BaseSettings):
@@ -41,6 +41,9 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     openai_base_url: str = ""
     aws_region: str = ""
+    ollama_base_url: str = "http://127.0.0.1:11434"
+    ollama_num_ctx: int = 8192
+    ollama_seed: int = 42
 
     # --- database -----------------------------------------------------------
     database_url: str = ""

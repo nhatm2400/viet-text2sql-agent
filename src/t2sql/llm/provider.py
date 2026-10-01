@@ -1,4 +1,4 @@
-"""Model provider adapter: anthropic | openai_compatible | bedrock | offline.
+"""Model provider adapter: anthropic | openai_compatible | bedrock | ollama_local | offline.
 
 `OFFLINE_MODE=1` swaps the real model for `OfflineProvider`, a `BaseChatModel` that replays a
 scripted sequence of tool calls from `tests/fixtures/offline_llm.json`. That is what makes CI,
@@ -18,7 +18,7 @@ import json
 import re
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any
 
 from langchain_core.callbacks import CallbackManagerForLLMRun
 from langchain_core.language_models import BaseChatModel
@@ -135,7 +135,22 @@ def get_model(role: ModelRole = "fast", **overrides: Any) -> BaseChatModel:
         **overrides,
     }
 
-    provider: Literal["anthropic", "openai_compatible", "bedrock"] = settings.model_provider
+    provider = settings.model_provider
+    if provider == "ollama_local":
+        from t2sql.llm.ollama_local import OllamaLocal
+
+        local_options = {
+            "model_name": name,
+            "base_url": settings.ollama_base_url,
+            "temperature": settings.model_temperature,
+            "num_predict": settings.model_max_tokens,
+            "num_ctx": settings.ollama_num_ctx,
+            "seed": settings.ollama_seed,
+            **overrides,
+        }
+        if "max_tokens" in local_options:
+            local_options["num_predict"] = local_options.pop("max_tokens")
+        return OllamaLocal(**local_options)
     try:
         if provider == "anthropic":
             from langchain_anthropic import ChatAnthropic

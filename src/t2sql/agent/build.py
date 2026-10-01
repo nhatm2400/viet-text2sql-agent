@@ -234,8 +234,14 @@ def summarise(state: AgentState, cap: int) -> dict[str, Any]:
         result["answer"] = EXHAUSTED_MESSAGE.format(max_iterations=cap)
     elif isinstance(last, AIMessage) and not last.tool_calls:
         result["answer"] = str(last.content)
-        if result["status"] == "error" and result["answer"]:
-            result["status"] = "executed" if result["rows"] else "error"
+        if (
+            result["status"] == "error"
+            and result["answer"]
+            and not any(call["name"] == "execute_sql" for call in calls)
+        ):
+            # A normal reply or refusal without execution is not a database result
+            # or a system error. Do not infer a policy decision from model prose.
+            result["status"] = "answered"
     elif result["status"] == "needs_clarification":
         result["answer"] = (result["clarification"] or {}).get("question", "")
 

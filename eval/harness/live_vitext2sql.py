@@ -7,10 +7,14 @@ execution agreement; this is not the official ViText2SQL or Spider leaderboard m
 from __future__ import annotations
 
 import argparse
+import hashlib
+import importlib.metadata
 import json
 import os
+import platform
 import random
 import re
+import sqlite3
 import threading
 import time
 import urllib.error
@@ -34,11 +38,27 @@ SOURCES = [
     "eval/harness/sqlite_readonly.py",
     "eval/harness/scoring.py",
     "eval/harness/compare_local.py",
+    "eval/harness/metrics.py",
     "eval/harness/live_local.py",
+    "eval/datasets/external/download_vitext2sql.py",
     "src/t2sql/agent/prompts.py",
     "src/t2sql/agent/build.py",
+    "src/t2sql/agent/state.py",
+    "src/t2sql/config.py",
+    "src/t2sql/observability/tracing.py",
     "src/t2sql/llm/ollama_local.py",
 ]
+
+
+def snapshot_sources(out: Path, expected: dict[str, str]):
+    """Preserve the exact implementation before inference, without copying local secrets."""
+    for name, digest in expected.items():
+        source = (REPO_ROOT / name).read_bytes()
+        if hashlib.sha256(source).hexdigest() != digest:
+            raise ValueError(f"Source changed before snapshot: {name}")
+        target = out / "source" / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(source)
 
 
 def acquire_run_lock(path: Path):
@@ -208,7 +228,7 @@ def read_records(path: Path, expected: set[tuple[str, str]]) -> list[dict]:
     return records
 
 
-def write_progress(out: Path, config: dict, records: list[dict], *, complete: bool):
+def summarize_records(config: dict, records: list[dict], *, complete: bool):
     summaries = {}
     for variant in config["variants"]:
         selected = [item for item in records if item["variant"] == variant]
@@ -216,7 +236,7 @@ def write_progress(out: Path, config: dict, records: list[dict], *, complete: bo
         nonempty = [item for item in selected if not item["gold_empty"]]
         summaries[variant]["nonempty_gold"] = metrics(nonempty) if nonempty else {"n": 0}
         summaries[variant]["empty_gold_questions"] = len(selected) - len(nonempty)
-    summary = {
+    return {
         "complete": complete,
         "selection": config["selection"],
         "source_count": config["source_count"],
@@ -226,6 +246,10 @@ def write_progress(out: Path, config: dict, records: list[dict], *, complete: bo
         "expected_predictions": len(config["evaluated_ids"]) * len(config["variants"]),
         "metrics": summaries,
     }
+
+
+def write_progress(out: Path, config: dict, records: list[dict], *, complete: bool):
+    summary = summarize_records(config, records, complete=complete)
     temporary = out / "progress.tmp"
     temporary.write_text(json.dumps(summary, indent=2), encoding="utf-8")
     temporary.replace(out / "progress.json")
@@ -243,9 +267,18 @@ def main():
     parser.add_argument("--pilot-size", type=int, default=0)
     parser.add_argument("--variant", choices=["both", "baseline", "agent"], default="both")
     parser.add_argument("--resume", type=Path)
+    parser.add_argument(
+        "--max-wall-seconds",
+        type=int,
+        default=0,
+        help="Pause between predictions after this session budget; 0 means no time limit",
+    )
     args = parser.parse_args()
     if args.num_predict < 1:
         parser.error("num-predict must be positive")
+    if args.max_wall_seconds < 0:
+        parser.error("max-wall-seconds must not be negative")
+    session_started = time.monotonic()
     manifest, items = load_package(args.package)
     if manifest["split"] == "test" and args.pilot_size:
         parser.error("Use train or dev for a pilot; keep the adapted test split intact")
@@ -296,6 +329,20 @@ def main():
         "scoring": "repository strict/relaxed execution agreement, not official leaderboard scoring",
         "execution": "native SQLite SELECT; read-only authorizer; no business allowlist or LIMIT rewriting; 5s SQL deadline, 100000-row failure cap",
         "source_sha256": {name: sha256(REPO_ROOT / name) for name in SOURCES},
+        "runtime": {
+            "python": platform.python_version(),
+            "sqlite": sqlite3.sqlite_version,
+            "packages": {
+                name: importlib.metadata.version(name)
+                for name in (
+                    "langgraph",
+                    "langchain-core",
+                    "sqlglot",
+                    "pydantic",
+                    "pydantic-settings",
+                )
+            },
+        },
     }
     out = (
         args.resume
@@ -307,47 +354,64 @@ def main():
         raise ValueError("Per-question external outputs must stay git-ignored under eval/results/")
     if not args.resume:
         out.mkdir(parents=True, exist_ok=False)
-    run_lock = acquire_run_lock(out / "run.lock")
-    if args.resume:
-        config = json.loads((out / "config.json").read_text(encoding="utf-8"))
-        for key, value in settings.items():
-            if config.get(key) != value:
-                raise ValueError(f"Resume incompatible with original run: {key}")
-    else:
-        config = settings
-    expected = {(item["id"], variant) for item in selected for variant in variants}
-    records = read_records(out / "items.jsonl", expected)
-    completed = {(item["id"], item["variant"]) for item in records}
-    model = OllamaLocal(model_name=args.model, base_url=args.base_url, num_predict=args.num_predict)
-    if not args.resume:
-        model.invoke([HumanMessage(content="Reply OK.")])
-        config["warmup"] = list(model.audit)
-        (out / "config.json").write_text(
-            json.dumps(config, ensure_ascii=False, indent=2), encoding="utf-8"
+    with acquire_run_lock(out / "run.lock"):
+        if args.resume:
+            config = json.loads((out / "config.json").read_text(encoding="utf-8"))
+            for key, value in settings.items():
+                if config.get(key) != value:
+                    raise ValueError(f"Resume incompatible with original run: {key}")
+        else:
+            config = settings
+            snapshot_sources(out, config["source_sha256"])
+        expected = {(item["id"], variant) for item in selected for variant in variants}
+        records = read_records(out / "items.jsonl", expected)
+        completed = {(item["id"], item["variant"]) for item in records}
+        model = OllamaLocal(
+            model_name=args.model, base_url=args.base_url, num_predict=args.num_predict
         )
-    print(f"Run: {out}", flush=True)
-    write_progress(out, config, records, complete=completed == expected)
-    with (out / "items.jsonl").open("a", encoding="utf-8") as stream:
-        for index, item in enumerate(selected):
-            order = variants if index % 2 == 0 else list(reversed(variants))
-            for variant in order:
-                if (item["id"], variant) in completed:
-                    continue
-                database = args.package / manifest["databases"][item["db_id"]]["path"]
-                context = manifest["databases"][item["db_id"]]["context"] + CALENDAR_WINDOW_RULES
-                record = evaluate_item(item, variant, model, database, context)
-                stream.write(json.dumps(record, ensure_ascii=False, default=str) + "\n")
-                stream.flush()
-                os.fsync(stream.fileno())
-                records.append(record)
-                completed.add((item["id"], variant))
-                write_progress(out, config, records, complete=completed == expected)
-                print(
-                    f"{len(records)}/{len(expected)} {item['id']}/{variant}: strict={record['strict']} {record['status']}",
-                    flush=True,
-                )
-    print(json.dumps(write_progress(out, config, records, complete=True), indent=2))
-    run_lock.close()
+        if not args.resume:
+            model.invoke([HumanMessage(content="Reply OK.")])
+            config["warmup"] = list(model.audit)
+            (out / "config.json").write_text(
+                json.dumps(config, ensure_ascii=False, indent=2), encoding="utf-8"
+            )
+        else:
+            # An explicit compatible resume acknowledges the previous pause request.
+            (out / "pause.request").unlink(missing_ok=True)
+        print(f"Run: {out}", flush=True)
+        write_progress(out, config, records, complete=completed == expected)
+        with (out / "items.jsonl").open("a", encoding="utf-8") as stream:
+            for index, item in enumerate(selected):
+                order = variants if index % 2 == 0 else list(reversed(variants))
+                for variant in order:
+                    if (item["id"], variant) in completed:
+                        continue
+                    time_limit_reached = (
+                        args.max_wall_seconds > 0
+                        and time.monotonic() - session_started >= args.max_wall_seconds
+                    )
+                    if (out / "pause.request").exists() or time_limit_reached:
+                        write_progress(out, config, records, complete=False)
+                        print(
+                            f"Paused: {len(records)}/{len(expected)} predictions saved", flush=True
+                        )
+                        return
+                    database = args.package / manifest["databases"][item["db_id"]]["path"]
+                    context = (
+                        manifest["databases"][item["db_id"]]["context"] + CALENDAR_WINDOW_RULES
+                    )
+                    record = evaluate_item(item, variant, model, database, context)
+                    stream.write(json.dumps(record, ensure_ascii=False, default=str) + "\n")
+                    stream.flush()
+                    os.fsync(stream.fileno())
+                    records.append(record)
+                    completed.add((item["id"], variant))
+                    write_progress(out, config, records, complete=completed == expected)
+                    print(
+                        f"{len(records)}/{len(expected)} {item['id']}/{variant}: strict={record['strict']} {record['status']}",
+                        flush=True,
+                    )
+        print(json.dumps(write_progress(out, config, records, complete=True), indent=2))
 
 
 if __name__ == "__main__":

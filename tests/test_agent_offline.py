@@ -114,8 +114,16 @@ def test_all_seed_questions_run_end_to_end() -> None:
         assert result["iterations"] <= 6
 
 
-def test_offline_mode_needs_no_keys_and_no_database(settings) -> None:
-    assert settings.offline_mode is True
-    assert settings.anthropic_api_key == ""
-    assert settings.database_url_ro == ""
-    assert run_agent("Doanh thu quý 2/2026 chia theo miền?")["status"] == "executed"
+def test_offline_mode_needs_no_keys_and_no_database(monkeypatch) -> None:
+    from t2sql.config import reload_settings
+
+    with monkeypatch.context() as env:
+        for name in ("DATABASE_URL", "DATABASE_URL_RO", "ANTHROPIC_API_KEY", "OPENAI_API_KEY"):
+            env.setenv(name, "")
+        env.setenv("OFFLINE_MODE", "1")
+        settings = reload_settings()
+        assert settings.offline_mode is True
+        assert settings.anthropic_api_key == ""
+        assert settings.database_url_ro == ""
+        assert run_agent("Doanh thu quý 2/2026 chia theo miền?")["status"] == "executed"
+    reload_settings()

@@ -42,7 +42,7 @@ class ToolCallView(BaseModel):
 
 class AskResponse(BaseModel):
     question: str
-    status: Literal["executed", "blocked", "needs_clarification", "error", "exhausted"]
+    status: Literal["executed", "answered", "blocked", "needs_clarification", "error", "exhausted"]
     sql: str | None = None
     rows: list[dict[str, Any]] = Field(default_factory=list)
     columns: list[str] = Field(default_factory=list)

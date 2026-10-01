@@ -78,9 +78,52 @@ def test_statement_timeout_is_set_on_the_role(ro_engine) -> None:
     """A cartesian product the AST policy failed to spot must still die in 5 seconds."""
     with ro_engine.connect() as conn:
         timeout = conn.execute(text("SHOW statement_timeout")).scalar()
-    assert timeout not in (None, "0"), "statement_timeout must be set for t2sql_ro"
+    assert timeout == "5s", "statement_timeout must be exactly 5 seconds for t2sql_ro"
 
 
 def test_transactions_default_to_read_only(ro_engine) -> None:
     with ro_engine.connect() as conn:
         assert conn.execute(text("SHOW default_transaction_read_only")).scalar() == "on"
+
+
+def test_timeout_actually_cancels_a_query(ro_engine) -> None:
+    with pytest.raises(SQLAlchemyError) as err, ro_engine.connect() as conn:
+        conn.execute(text("SELECT pg_sleep(6)"))
+    assert getattr(err.value.orig, "sqlstate", None) == "57014"
+
+
+def test_write_still_fails_when_readonly_default_is_disabled(ro_engine) -> None:
+    with pytest.raises(SQLAlchemyError) as err, ro_engine.connect() as conn:
+        conn.execute(text("SET TRANSACTION READ WRITE"))
+        conn.execute(text("UPDATE orders SET status = 'paid' WHERE order_id = -1"))
+    assert getattr(err.value.orig, "sqlstate", None) == "42501"
+
+
+def test_trace_table_is_inaccessible_to_query_role(ro_engine) -> None:
+    with pytest.raises(SQLAlchemyError) as err, ro_engine.connect() as conn:
+        conn.execute(text("SELECT * FROM agent_traces LIMIT 1"))
+    assert getattr(err.value.orig, "sqlstate", None) == "42501"
+
+
+def test_application_session_timeout_survives_pool_initialization(ro_engine, monkeypatch) -> None:
+    from t2sql.config import reload_settings
+    from t2sql.tools.execute_tool import _RO_ENGINES, _readonly_engine
+
+    url = reload_settings().database_url_ro
+    old_engine = _RO_ENGINES.pop(url, None)
+    if old_engine is not None:
+        old_engine.dispose()
+    monkeypatch.setenv("STATEMENT_TIMEOUT_MS", "100")
+    reload_settings()
+    try:
+        engine = _readonly_engine(url)
+        for _ in range(2):
+            with engine.connect() as conn:
+                assert conn.execute(text("SHOW statement_timeout")).scalar() == "100ms"
+        with pytest.raises(SQLAlchemyError) as err, engine.connect() as conn:
+            conn.execute(text("SELECT pg_sleep(0.3)"))
+        assert getattr(err.value.orig, "sqlstate", None) == "57014"
+    finally:
+        _RO_ENGINES.pop(url).dispose()
+        monkeypatch.delenv("STATEMENT_TIMEOUT_MS")
+        reload_settings()

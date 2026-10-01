@@ -1,0 +1,22 @@
+{
+  "checked_at_utc": "2026-10-01T17:55:58.524224+00:00",
+  "entrypoint": "ui/streamlit_app.py via Streamlit AppTest runtime",
+  "offline_mode": false,
+  "provider": "ollama_local",
+  "status": "executed",
+  "rows": [
+    {
+      "count": 2351
+    }
+  ],
+  "sql": "SELECT COUNT(*) FROM orders WHERE created_at >= '2026-06-01 00:00:00' AND created_at < '2026-07-01 00:00:00' LIMIT 1000",
+  "tool_names": [
+    "get_table_schema",
+    "execute_sql"
+  ],
+  "success_feedback": [
+    "Query executed · 1 dòng · 2 vòng · 122357 ms"
+  ],
+  "exception_count": 0,
+  "limitations": "One live UI request, not an accuracy benchmark or visual browser review."
+}

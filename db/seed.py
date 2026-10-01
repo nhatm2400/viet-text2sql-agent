@@ -391,10 +391,10 @@ def _repair_v2(rows: dict[str, list[dict]]) -> None:
     rows["reviews"] = verified_reviews
 
 
-def seed(url: str, *, drop: bool = True) -> dict[str, int]:
+def seed(url: str, *, drop: bool = True, version: str = "v1") -> dict[str, int]:
     engine = create_engine(url)
     dialect = "sqlite" if engine.dialect.name == "sqlite" else "postgres"
-    rows = build_rows()
+    rows = build_rows(version=version)
     counts = {t: len(rows[t]) for t in rows}
 
     with engine.begin() as conn:
@@ -424,6 +424,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--url", default=os.getenv("DATABASE_URL", ""), help="SQLAlchemy URL")
     parser.add_argument("--keep", action="store_true", help="do not DROP existing tables first")
+    parser.add_argument("--version", choices=["v1", "v2"], default="v1")
     args = parser.parse_args(argv)
 
     if not args.url:
@@ -438,7 +439,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.url.startswith("sqlite"):
         Path("data").mkdir(exist_ok=True)
 
-    counts = seed(args.url, drop=not args.keep)
+    counts = seed(args.url, drop=not args.keep, version=args.version)
     print(
         f"Seeded (RNG_SEED={RNG_SEED}, snapshot {SNAPSHOT_START:%Y-%m-%d}..{SNAPSHOT_END:%Y-%m-%d}):"
     )

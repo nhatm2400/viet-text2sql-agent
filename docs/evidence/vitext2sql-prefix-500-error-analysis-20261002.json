@@ -1,0 +1,33 @@
+{
+  "evaluated_predictions": 500,
+  "strict_failures": 195,
+  "exclusive_observed_categories": {
+    "no_successful_sql_with_output_cap": 36,
+    "projection_difference_relaxed_match": 58,
+    "row_count_difference": 61,
+    "row_order_only_difference": 1,
+    "strict_correct": 305,
+    "too_few_columns": 7,
+    "value_or_projection_difference": 32
+  },
+  "overlapping_syntax_difference_hints_among_strict_failures": {
+    "aggregates": 60,
+    "filters": 80,
+    "grouping": 67,
+    "having": 4,
+    "joins": 75,
+    "limits": 1,
+    "literals": 63,
+    "ordering": 29,
+    "set_operations": 17,
+    "tables": 126
+  },
+  "strict_failures_with_any_output_cap": 39,
+  "evidence_sha256": {
+    "config.json": "f36a18e0396dc575906907c7610f15f3758bb57755cd873253c90223aeb1e7b8",
+    "items.jsonl": "5300346d9daedf7382442cd43872fe475cda35a226597e914b7049921a5b662a",
+    "progress.json": "2f859b45011cc6715f56ce594895c135b963ac2bcd3f0902d07e016c044b255a"
+  },
+  "review": "Automated result replay and syntactic diagnostics; not independent human semantic review",
+  "limitations": "Categories describe observed results, not proven root causes. Syntax differences can be equivalent SQL. Prefix selection is not random; no model calls or score changes."
+}

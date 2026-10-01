@@ -16,6 +16,7 @@ Run: `make run-ui` (streamlit run ui/streamlit_app.py). Works offline with zero 
 from __future__ import annotations
 
 import json
+import logging
 import sys
 from pathlib import Path
 
@@ -40,6 +41,7 @@ SAMPLE_QUESTIONS = [
 ]
 
 STATUS_STYLE = {
+    "answered": ("ℹ️", "Đã trả lời, không thực thi SQL"),
     "executed": ("✅", "Query executed"),
     "blocked": ("⛔", "Blocked by SQL safety policy"),
     "needs_clarification": ("❓", "The agent asked a clarifying question"),
@@ -90,7 +92,21 @@ tab_answer, tab_trace, tab_history = st.tabs(["Kết quả", "Agent trace", "Tra
 
 if ask_clicked and question.strip():
     with st.spinner("Agent đang chạy..."):
-        result = run_agent(question.strip())
+        try:
+            result = run_agent(question.strip())
+        except Exception as err:  # noqa: BLE001 - show a recoverable error, never a traceback
+            trace_id = tracing.new_trace_id()
+            logging.getLogger(__name__).exception("UI request failed; trace %s", trace_id)
+            result = {
+                "status": "error",
+                "answer": f"Không hoàn thành được câu hỏi ({type(err).__name__}).",
+                "trace_id": trace_id,
+                "tool_calls": [],
+                "sql": None,
+                "rows": [],
+                "chart_spec": None,
+                "blocked_reasons": [],
+            }
     st.session_state["result"] = result
 
 result = st.session_state.get("result")
@@ -125,6 +141,10 @@ with tab_answer:
             st.write(result["answer"])
         elif result["status"] == "error":
             st.error(f"{icon} **{label}** — {result['answer']}")
+            st.caption("Kiểm tra model local và kết nối database, sau đó bấm Hỏi để thử lại.")
+        elif result["status"] == "answered":
+            st.info(f"{icon} **{label}**")
+            st.write(result["answer"])
         else:
             st.success(
                 f"{icon} {label} · {len(result['rows'])} dòng · "

@@ -84,6 +84,28 @@ chỉ số tổng hợp; không commit câu hỏi, gold SQL, database hoặc raw
 - Ghi thêm metric trên gold không rỗng để nhìn rõ nguy cơ SQL sai cùng trả kết quả rỗng.
   Single-snapshot agreement vẫn có false positives; không chứng minh toàn bộ ngữ nghĩa SQL.
 
+## Pilot đã kiểm chứng lại ngày 01/10
+
+Pilot dev cố định 4 câu / 4 database đã hoàn tất 8 predictions: baseline **2/4 (50%)**,
+agent **3/4 (75%)**, cả strict và relaxed. Ba misses đều chạm output cap trước khi có
+SQL thành công. Đã replay SQL trên database có hash cố định, tính lại scoring/summary,
+kiểm tra token usage và hashes của source snapshot. Báo cáo chỉ chứa tổng hợp:
+[vitext2sql-dev-pilot-20261001.json](evidence/vitext2sql-dev-pilot-20261001.json).
+
+Kiểm tra ngữ nghĩa nội bộ bằng AI trên bốn câu dev thấy gold phù hợp với câu hỏi;
+đây không phải independent human audit. Không chỉnh prompt hoặc chọn lại pilot sau điểm số.
+**75% trên 4 câu không phải accuracy trên 1.618 câu**, và không dùng làm dự báo độ chính xác.
+
+Lượt agent đầy đủ đã khởi động ngày 01/10, tạm dừng ở 124/1.618 câu, resume lúc 14:18
+rồi tạm dừng ở 302/1.618 câu; resume lúc 20:12 ngày 01/10 rồi tạm dừng theo yêu cầu
+ở 490/1.618 câu, còn 1.128 câu;
+checkpoint và cách tiếp tục có tại
+[ACTIVE_EVAL_2026-10-01.vi.md](ACTIVE_EVAL_2026-10-01.vi.md).
+
+**Cập nhật 02/10:** đã chạy thêm tới đúng 500 rồi dừng theo yêu cầu; replay xác nhận
+61,0% strict và 72,6% relaxed trên prefix 500 câu / 15 database. Phạm vi và câu CV:
+[EVAL_500_RESULTS.vi.md](EVAL_500_RESULTS.vi.md). Full run vẫn chưa hoàn tất.
+
 ## Chạy và tiếp tục checkpoint
 
 ```powershell
@@ -98,27 +120,38 @@ chỉ số tổng hợp; không commit câu hỏi, gold SQL, database hoặc raw
 .venv/Scripts/python.exe -m eval.harness.live_vitext2sql --package data/external/vitext2sql/packages/dev-v3 --pilot-size 4 --num-predict 4096
 
 # Toàn bộ 1.618 câu hợp lệ của adapted test; không sample để chọn câu dễ
-.venv/Scripts/python.exe -m eval.harness.live_vitext2sql --package data/external/vitext2sql/packages/test-v2 --num-predict 4096
+.venv/Scripts/python.exe -m eval.harness.live_vitext2sql --package data/external/vitext2sql/packages/test-v2 --variant agent --num-predict 4096
 
 # Nếu bị ngắt: giữ nguyên code/config/package/model, thay run path thật
-.venv/Scripts/python.exe -m eval.harness.live_vitext2sql --package data/external/vitext2sql/packages/test-v2 --num-predict 4096 --resume eval/results/<run-vitext2sql-test>
+.venv/Scripts/python.exe -m eval.harness.live_vitext2sql --package data/external/vitext2sql/packages/test-v2 --variant agent --num-predict 4096 --resume eval/results/<run-vitext2sql-test>
+
+# Sau khi hoàn tất: replay scoring và xuất báo cáo chỉ chứa tổng hợp
+.venv/Scripts/python.exe -m eval.harness.report_vitext2sql --run eval/results/<run-vitext2sql-test> --output docs/evidence/<report-moi>.json
 ```
 
 Runner ghi `config.json`, `items.jsonl` và `progress.json` sau mỗi prediction; chỉ tạo
 `summary.json` khi hoàn tất. Resume giữ các lần sai đã ghi, không chạy lại để chọn đáp án đẹp.
 Kiểm tra hashes package/database/code/model options và IDs; từ chối source/config thay đổi,
 record trùng hoặc worker thứ hai chạy cùng checkpoint. Không đổi code khi run lớn đang chạy.
+Runner mới lưu source snapshot và phiên bản Python, SQLite, thư viện trước inference;
+thay đổi runtime cũng làm resume bị từ chối. Lock được giải phóng cả khi run gặp exception.
+Các pilot cũ có source snapshot lịch sử nhưng không có runtime metadata đầy đủ;
+không dùng runner mới để resume chúng với code khác.
 Nếu kết quả test được dùng để chỉnh prompt, lượt tiếp theo không còn là đánh giá độc lập
 trên tập chưa xem. Phải ghi rõ dev tuning hoặc giữ một test version mới.
 
 ## Kiểm thử
 
-**137 passed, 7 skipped** do chưa cấu hình PostgreSQL, 1 cảnh báo LangGraph deprecation;
-lint và format đạt, kiểm chứng trước commit ngày 01/10.
+**162 passed, 7 skipped** do chưa cấu hình PostgreSQL, 1 cảnh báo LangGraph deprecation;
+lint và format đạt, kiểm chứng ngày 02/10 sau khi bổ sung báo cáo prefix.
 Test mới kiểm tra COUNT(*) fast path, CTE, giữ duplicates, chặn DDL/ATTACH/catalog/function,
 ghép AST không bỏ qua literal/db_id, pilot cố định, hash thay đổi và khóa checkpoint chống trùng.
-Đã kiểm tra baseline dừng khi mất kết nối Ollama và giữ các prediction đã ghi;
-kiểm tra riêng đường exception qua agent vẫn cần hoàn tất trước lượt dài.
+Đã kiểm tra cả baseline và agent dừng khi mất kết nối/timeout, kể cả agent đã thực thi
+SQL thành công nhưng mất kết nối lúc sinh câu trả lời cuối. Kiểm tra CLI bị ngắt rồi
+resume chỉ chạy phần chưa ghi; các misses đã ghi giữ nguyên; không chấm lượt chưa xong.
+Báo cáo từ chối evidence thiếu predictions, scoring bị đổi, summary hoặc source snapshot sai.
+Báo cáo prefix yêu cầu đầy đủ predictions của các ID đầu tiên theo thứ tự nguồn;
+ghi riêng trạng thái subset đã hoàn tất và full run chưa hoàn tất, không tạo summary full giả.
 
 ## Cách ghi CV sau lượt lớn
 

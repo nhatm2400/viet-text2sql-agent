@@ -12,7 +12,9 @@ from typing import Annotated, Any, Literal, TypedDict
 from langchain_core.messages import BaseMessage
 from langgraph.graph.message import add_messages
 
-RunStatus = Literal["running", "executed", "blocked", "needs_clarification", "error", "exhausted"]
+RunStatus = Literal[
+    "running", "executed", "answered", "blocked", "needs_clarification", "error", "exhausted"
+]
 
 
 class AgentState(TypedDict, total=False):
