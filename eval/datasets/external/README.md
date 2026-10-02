@@ -1,4 +1,4 @@
-# External datasets — licences and version pins
+# External datasets - licences and version pins
 
 **No dataset file is ever committed to this repository.** This directory contains download
 scripts only. Everything they fetch lands in `data/external/`, which is git-ignored.
@@ -17,7 +17,7 @@ labels were corrected. Two consequences are treated here as methodology, not opt
 2. a **sample of every subset is manually audited** before any number derived from it is reported.
 
 Numbers from these sets are always reported separately from `core_vi`, never merged into a single
-headline figure — the settings differ.
+headline figure - the settings differ.
 
 ## ViText2SQL
 
@@ -61,13 +61,13 @@ See [the Vietnamese workflow and measured pilot](../../../docs/VITEXT2SQL_LOCAL_
 - Paper: Yu T. et al. (2018), EMNLP 2018.
 - Licence: CC BY-SA 4.0.
 - Role here: an **English sanity check only**. Spider 1.0 is effectively saturated for modern
-  LLMs (~86–91% EX for GPT-4-class methods), so it is reported as a floor check, never as
+  LLMs (~86-91% EX for GPT-4-class methods), so it is reported as a floor check, never as
   evidence of quality.
 - Pinned to: `VERSION_TAG` in `download_spider_subset.py`.
 
 ## Out of scope
 
-- **Spider 2.0** (632 enterprise workflow tasks, schemas often exceeding 1,000 columns) — out of
+- **Spider 2.0** (632 enterprise workflow tasks, schemas often exceeding 1,000 columns) - out of
   scope for this MVP (proposal §3).
-- **BIRD** — one BIRD database is planned as a wide-schema retrieval stress test, kept in its
+- **BIRD** - one BIRD database is planned as a wide-schema retrieval stress test, kept in its
   native SQLite. The harness accepts any SQLAlchemy URI read-only, so there is no Postgres port.

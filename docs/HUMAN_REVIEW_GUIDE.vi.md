@@ -128,7 +128,7 @@ GROUP BY substr(p.paid_at, 1, 7)
 ORDER BY month;
 ```
 
-Chỉ có tháng 04–06; joined_rows bằng unique_payments cho biết JOIN này không nhân payment.
+Chỉ có tháng 04-06; joined_rows bằng unique_payments cho biết JOIN này không nhân payment.
 Cộng tổng chưa làm tròn rồi làm tròn cuối cùng đến 2 số để đối chiếu gold. Cộng các tổng đã
 làm tròn theo tháng có thể khác vài xu. Con số lớn trên dữ liệu synthetic không chứng minh
 doanh thu thực hoặc tính đại diện của dữ liệu.

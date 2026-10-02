@@ -1,4 +1,4 @@
-# Agent eval — checkpoint từ 01/10/2026
+# Agent eval - checkpoint từ 01/10/2026
 
 **Sau mốc 500:** ngày 02/10 code app/provider được phát triển thêm cho demo PostgreSQL.
 Checkout hiện tại khác source snapshots của run; runner sẽ từ chối resume cùng checkpoint.
@@ -8,8 +8,8 @@ của run. Sau khi phân tích lỗi, tối ưu trên development và đánh gi�
 
 **Trạng thái hiện tại (02/10):** đã tự dừng ở **đúng 500/1.618 câu** theo yêu cầu;
 worker đã thoát, 500 predictions không trùng ID/variant. Strict **305/500 = 61,0%**,
-relaxed **363/500 = 72,6%** trên source-order prefix, 15 database và 332 cặp database–SQL AST.
-Đã replay scoring và kiểm tra hashes; kết quả/câu CV:
+relaxed **363/500 = 72,6%** trên source-order prefix, 15 database và 332 cặp database-SQL AST.
+Đã replay scoring và kiểm tra hashes; báo cáo kết quả:
 [EVAL_500_RESULTS.vi.md](EVAL_500_RESULTS.vi.md). Còn 1.118 câu; không tự tiếp tục.
 Helper/log phiên cutoff: `eval/results/to-500-20261001-165904-721888/`.
 Tập 1.618 câu vẫn chưa hoàn tất; không gọi kết quả prefix là accuracy toàn tập.
@@ -90,7 +90,7 @@ Không chạy lại câu sai để chọn câu trả lời tốt hơn. PID và l
 - Kiểm chứng mất kết nối/timeout cả baseline và agent, checkpoint/resume, pause và ngân sách phiên.
 - Đã xuất [pilot tổng hợp](evidence/vitext2sql-dev-pilot-20261001.json), replay SQL và scoring:
   baseline 2/4, agent 3/4. Pilot không dự báo accuracy toàn tập.
-- 42 database có hashes đúng. 1.618 câu gồm 1.004 cặp database–SQL AST khác nhau;
+- 42 database có hashes đúng. 1.618 câu gồm 1.004 cặp database-SQL AST khác nhau;
   174 gold trả rỗng. 290 câu không hợp lệ được loại trước inference, đã lưu ledger.
 - Chưa có independent human sample audit; không gọi bản thích nghi là human-reviewed.
 

@@ -1,4 +1,4 @@
-# Kết quả eval 500 câu để ghi CV — 02/10/2026
+# Kết quả eval 500 câu - 02/10/2026
 
 Đã chạy và dừng ở **đúng 500 câu**, worker đã thoát. Đã replay prediction/gold trên
 database có hash cố định, kiểm tra scoring, token usage, summary và source snapshots.
@@ -9,10 +9,10 @@ hoặc raw responses của dataset bên ngoài.
 |---|---:|
 | Câu hỏi đã đánh giá | **500** |
 | Database đã phủ | **15 / 42** trong package hợp lệ |
-| Cặp database–SQL AST khác nhau, gồm literal | 332 |
-| Strict execution accuracy của repo | **61,0% — 305/500** |
-| Relaxed execution accuracy của repo | **72,6% — 363/500** |
-| Strict trên gold không rỗng | 60,45% — 298/493 |
+| Cặp database-SQL AST khác nhau, gồm literal | 332 |
+| Strict execution accuracy của repo | **61,0% - 305/500** |
+| Relaxed execution accuracy của repo | **72,6% - 363/500** |
+| Strict trên gold không rỗng | 60,45% - 298/493 |
 | Gold trả rỗng | 7 |
 | Câu chạm output cap ít nhất một model call | 40 |
 | Câu không có SQL thực thi thành công | 36 |
@@ -37,22 +37,10 @@ output cap=4096 mỗi call. LangGraph tối đa hai lần thử SQL, ba vòng to
 cuối được tính vào latency/tokens. Read-only SQLite, không inject LIMIT. Scorer là
 strict/relaxed execution agreement của repo, không phải evaluator leaderboard chính thức.
 
-500 câu là quy mô hợp lý để mô tả một đánh giá sơ bộ cho prototype trên CV, có số đo
-và bằng chứng tái lập. Phạm vi mới phủ 15/42 database và có cấu trúc SQL lặp lại, nên
-không dùng tỷ lệ này như ước lượng đại diện cho toàn bộ test. Chưa có independent human
+Kết quả 500 câu có số đo và bằng chứng tái lập. Phạm vi mới phủ 15/42 database
+và có cấu trúc SQL lặp lại, nên không dùng tỷ lệ này như ước lượng đại diện cho toàn bộ
+test. Chưa có independent human
 sample audit cho bản thích nghi. Không ghi 1.000/1.618 câu đã đánh giá hoặc official EX.
-
-## Câu CV có thể dùng
-
-> Benchmarked a local Qwen3 4B LangGraph Text-to-SQL agent on a 500-question adapted ViText2SQL subset across 15 SQLite databases, achieving 61.0% strict execution accuracy.
-
-```latex
-\resumeItemPlain{Benchmarked a local Qwen3 4B LangGraph Text-to-SQL agent on a 500-question adapted ViText2SQL subset across 15 SQLite databases, achieving 61.0\% strict execution accuracy.}
-```
-
-Ghi rõ subset trong CV và liên kết repo/report để người đọc kiểm tra cách chọn 500 câu
-và định nghĩa metric. Có thể giữ riêng bullet về agent nghiệp vụ 12 bảng PostgreSQL;
-61,0% ở trên được đo trên SQLite của benchmark ngoài.
 
 ## Tái kiểm chứng
 

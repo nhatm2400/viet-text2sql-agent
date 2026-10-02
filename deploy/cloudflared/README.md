@@ -1,6 +1,6 @@
 # Cloudflare Tunnel setup
 
-Public exposure for the demo. `cloudflared` is a native binary with a systemd unit — it was
+Public exposure for the demo. `cloudflared` is a native binary with a systemd unit - it was
 never Docker-dependent, so it is unaffected by this project's no-Docker constraint.
 
 **Not executed by the scaffold.** These are the steps to run on the VPS once.
@@ -11,7 +11,7 @@ never Docker-dependent, so it is unaffected by this project's no-Docker constrai
   dials **out** to Cloudflare.
 - TLS terminates at Cloudflare's edge, so there is no certificate to renew on the host and Caddy
   can stay on plain HTTP over loopback (`auto_https off` in `deploy/Caddyfile`).
-- Free tier, and it reconnects by itself after a network blip — which is the "demo dead when a
+- Free tier, and it reconnects by itself after a network blip - which is the "demo dead when a
   reviewer clicks" risk in the proposal.
 
 ## Steps
@@ -20,7 +20,7 @@ never Docker-dependent, so it is unaffected by this project's no-Docker constrai
 # 1. Authenticate (opens a browser link; pick the zone you already manage)
 cloudflared tunnel login
 
-# 2. Create the tunnel — this writes credentials to /root/.cloudflared/<TUNNEL_ID>.json
+# 2. Create the tunnel. Credentials go to /root/.cloudflared/<TUNNEL_ID>.json
 cloudflared tunnel create t2sql
 
 # 3. Route a hostname to it. This creates the CNAME
@@ -28,7 +28,7 @@ cloudflared tunnel create t2sql
 #    in the same zone already used for the Vercel project.
 cloudflared tunnel route dns t2sql t2sql.<your-domain>
 
-# 4. Point the tunnel at Caddy (Caddy fronts BOTH services on one host — see deploy/Caddyfile)
+# 4. Point the tunnel at Caddy (see deploy/Caddyfile for both services)
 sudo tee /etc/cloudflared/config.yml >/dev/null <<'YAML'
 tunnel: t2sql
 credentials-file: /root/.cloudflared/<TUNNEL_ID>.json
@@ -53,7 +53,7 @@ The tunnel token / credentials file is **never committed**. Two supported ways t
   (`cloudflared tunnel run --token "$CLOUDFLARE_TUNNEL_TOKEN"`).
 
 `.gitignore` excludes `.env` and `*.key`/`*.pem`. If a token is ever pasted into a file in this
-repository, rotate it in the Cloudflare dashboard — removing the commit is not enough.
+repository, rotate it in the Cloudflare dashboard - removing the commit is not enough.
 
 ## Verifying
 

@@ -3,7 +3,6 @@
 Every choice made while scaffolding this repository that the spec (`docs/scaffold-prompt.md`) did
 not specify. Recorded so a reviewer can tell a deliberate decision from an accident.
 
----
 
 ## Where a container was tempting, and what was done instead
 
@@ -27,23 +26,22 @@ been the reflex:
 `.github/workflows/ci.yml` fails the lint job on container tooling that is actually **used**: it looks for
 artefacts (`Dockerfile*`, `docker-compose*.yml`, `.devcontainer`, `.dockerignore`) and for
 invocations (`docker run|build|compose|…`, `kubectl `, `helm install|upgrade|template`). It
-deliberately does **not** grep for the bare word — the first version did, and it failed on the
+deliberately does **not** grep for the bare word - the first version did, and it failed on the
 comments explaining the constraint, including its own. A check that fires on prose about a rule
 rather than on violations of it teaches people to disable the check.
 
 **CI moved from GitLab CI to GitHub Actions** once the repository actually landed on GitHub
 (`github.com/nhatm2400/viet-text2sql-agent`). The pipeline stages are unchanged
 (`lint → test → security → deploy`); only the syntax and the secret names differ. This was not a
-preference — a `.gitlab-ci.yml` on a GitHub remote simply never runs, which would have made the
+preference - a `.gitlab-ci.yml` on a GitHub remote simply never runs, which would have made the
 proposal's claim that "the security suite runs as a distinct CI job" **false in practice**. The
 proposal and both README languages were corrected rather than left aspirational.
 
 One incidental improvement: **GitHub-hosted runners are virtual machines, not containers**, so
-the honest caveat the GitLab version needed — that GitLab's shared runners execute jobs inside
-containers on GitLab's infrastructure — no longer applies. There is now no container anywhere in
+the honest caveat the GitLab version needed - that GitLab's shared runners execute jobs inside
+containers on GitLab's infrastructure - no longer applies. There is now no container anywhere in
 the loop, not even one owned by someone else.
 
----
 
 ## Dependencies and packaging
 
@@ -55,7 +53,6 @@ the loop, not even one owned by someone else.
 | `hatchling` build backend, `src/` layout | Needed for `pip install -e .` to expose `t2sql` without a `sys.path` hack in every entry point. |
 | No `__init__.py` under `eval/` | `python -m eval.harness.runner` works via PEP 420 namespace packages. Adding init files would have meant adding files the target tree does not list. |
 
----
 
 ## Architecture
 
@@ -64,15 +61,15 @@ tool returns the same Pydantic shape (`status`, `message`, `data`, `error_kind`)
 store writes `result` as JSONB and the agent needs a machine-readable status to choose a recovery
 strategy. Free-text error strings would make that decision guesswork.
 
-**`ast_policy` imports `schema_tools.load_schema()` (lazily).** Architecturally backwards —
-guardrails depending on tools — but the alternative was duplicating the schema parser, and two
+**`ast_policy` imports `schema_tools.load_schema()` (lazily).** Architecturally backwards -
+guardrails depending on tools - but the alternative was duplicating the schema parser, and two
 parsers that can disagree about which columns exist is a worse security property than one
 slightly awkward import. There is no cycle: `schema_tools` imports nothing from `guardrails`.
 
 **Tracing split.** A wrapper in `agent/build.py` traces every tool; `execute_sql` opts out via
 `metadata={"self_logs": True}` and writes its own audit row next to the policy check. Rationale:
 the audit log is part of the security guarantee, so it belongs with enforcement rather than with
-the graph — and double-logging would corrupt the tool-calls-per-question metric.
+the graph - and double-logging would corrupt the tool-calls-per-question metric.
 
 **`tracing.current_trace_id` is a `ContextVar`.** Tool wrappers need the run's trace id without
 threading it through every tool signature. A ContextVar (not a module global) keeps concurrent
@@ -80,7 +77,7 @@ FastAPI requests from cross-writing each other's traces.
 
 **Custom nodes around LangGraph's prebuilt `ToolNode`.** `ToolNode` executes the tools; a thin
 wrapper node increments `iteration_count`, and the conditional edges own both stop conditions.
-Keeping the cap in a plain routing function — rather than inside a tool or a callback — is what
+Keeping the cap in a plain routing function - rather than inside a tool or a callback - is what
 makes it auditable in about ten lines.
 
 **`recursion_limit = 2 * cap + 4`.** LangGraph's own runaway guard, set deliberately looser than
@@ -91,13 +88,12 @@ that is a bug in the routing edge, not a tuning problem.
 result at the end keeps `AgentState` small and means the API, the eval harness and the demo all
 read the run the same way.
 
----
 
 ## Security decisions the spec left open
 
 | Decision | Reasoning |
 |---|---|
-| `SELECT *` blocked when a sensitive-column table is in scope | A star projection returns `customers.email` without ever naming it. `SELECT * FROM regions` still passes — the rule is targeted, not blanket. |
+| `SELECT *` blocked when a sensitive-column table is in scope | A star projection returns `customers.email` without ever naming it. `SELECT * FROM regions` still passes - the rule is targeted, not blanket. |
 | `COUNT(*)` explicitly exempted | A star inside an aggregate returns no column values. Blocking it made `q004` fail; the fix is narrow (star whose parent is a function). |
 | Sensitive columns denied in `WHERE`, not just the projection | `WHERE email = 'x'` is an oracle: repeated queries enumerate the column one guess at a time. |
 | Comment smuggling = any `;` or DDL/DML keyword inside a comment | Strict, and it can reject a harmless comment. Accepted: comments carry no analytical value in generated SQL. String literals are excluded by a hand-written scanner, so `WHERE channel = 'we--b'` still works. |
@@ -106,14 +102,13 @@ read the run the same way.
 | Blocked queries return HTTP 200 | A 4xx would make "the policy worked" indistinguishable from "the request was malformed" in every client and in the demo UI. |
 | No auth on the API | Non-goal per the proposal. The read-only role is the access-control boundary, and that is stated rather than implied. |
 
----
 
 ## Evaluation decisions
 
 **Offline `execute_sql` replays recorded result sets, it does not skip the policy.** The AST check
 runs in full; only the database driver is replaced by a lookup in
 `tests/fixtures/offline_sql.json`. Without this, `make demo-offline` could not show a final
-answer or a chart — and, more importantly, the bypass test would not be exercising the offline
+answer or a chart - and, more importantly, the bypass test would not be exercising the offline
 path that CI actually runs.
 
 **Fixture result sets are recorded from the real seeded snapshot**, never hand-written. Invented
@@ -154,7 +149,6 @@ no rounding down of realism.
 **A `paraphrase/pairs.jsonl` scaffold with a `_comment` schema line**, loaded and skipped by the
 runner. An empty file would not communicate the shape.
 
----
 
 ## Deployment decisions
 
@@ -168,25 +162,23 @@ runner. An empty file would not communicate the shape.
 | `keepalive_ping.py` restarts via `systemctl`, not just pings | systemd's `Restart=on-failure` covers a crashed process. It cannot see a process that is alive but wedged; this can. |
 | Nightly `pg_dump`, 7-day rotation | Enough to recover a demo. Explicitly not a production backup, and said so in the README. |
 
----
 
 ## Not done, and why
 
-- **Retrieval (`retrieval/*`, `search_examples`)** — typed stubs raising `NotImplementedError`
+- **Retrieval (`retrieval/*`, `search_examples`)** - typed stubs raising `NotImplementedError`
   with a pointer. It is a hypothesis under test (ablations A2/A3), and the one piece of direct
   Vietnamese evidence available reports schema filtering *underperforming* plain few-shot. A
   half-working version would contaminate the baseline it is meant to be compared against.
-- **Vietnamese time-expression resolution** — stubbed. The hard part is not parsing "quý trước";
+- **Vietnamese time-expression resolution** - stubbed. The hard part is not parsing "quý trước";
   it is that fiscal quarters, "tháng này" mid-month and "cùng kỳ năm ngoái" need an agreed
   convention with the business before any of them can be called correct.
-- **The repair loop's internals** — the agent already retries after a failed `execute_sql` (the
+- **The repair loop's internals** - the agent already retries after a failed `execute_sql` (the
   offline demo shows it); the *bounded, configurable* repair of ablation A4 is not built.
 - **`glossary.yaml` has 3 verified terms and 15 TODO keys.** Unverified entries are excluded from
   the system prompt entirely: a wrong mapping the agent trusts is worse than no mapping.
-- **External dataset downloads** — scripts print their licence and exit. Neither was executed,
+- **External dataset downloads** - scripts print their licence and exit. Neither was executed,
   and both `VERSION_TAG`s are unpinned placeholders that must be pinned before any reported run.
 
----
 
 ## Repository changes outside the target tree
 

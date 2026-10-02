@@ -1,4 +1,4 @@
-# Bổ sung CHECK constraints vào schema context — 30/09/2026
+# Bổ sung CHECK constraints vào schema context - 30/09/2026
 
 Đây là mốc trước khi thêm quy tắc khoảng ngày. Phép thử tiếp theo đạt 80% cho cả hai
 phương án, với cùng CHECK constraints và output cap; xem [kết quả ngày](DATE_WINDOW_RESULTS.vi.md).
@@ -90,7 +90,7 @@ Nếu chạy model lại, thay --after bằng run mới. Không chọn lượt c
 Đây là một lượt trên 20 câu từ 10 family × 2 miền, synthetic, AI-authored/AI-reviewed.
 Context được phát triển trên dev đã xem kết quả; không gọi là held-out, human-reviewed hay
 đánh giá PostgreSQL. Model có thể biến thiên dù seed cố định; chưa có độ tin cậy thống kê,
-đo VI–EN, RAG, UI đầy đủ hoặc production. Execution accuracy có thể tình cờ khớp trên snapshot.
+đo VI-EN, RAG, UI đầy đủ hoặc production. Execution accuracy có thể tình cờ khớp trên snapshot.
 30 câu test chưa được chạy model.
 
 Giữ CHECK constraints trong context vì schema có nguồn rõ và đã cải thiện mốc dev này.
@@ -98,20 +98,3 @@ Giữ CHECK constraints trong context vì schema có nguồn rõ và đã cải 
 Riêng câu quantity có cụm “loại đơn cancelled”: cần kiểm tra lại độ rõ của tiếng Việt trước
 khi sửa prompt; không mặc định mọi sai khác đều là lỗi model. Nếu sửa câu hỏi để rõ hơn,
 phải version benchmark và phân biệt với kết quả trên bộ câu hỏi hiện tại.
-
-## Bullet CV hiện tại
-
-Các bullet dưới đây mô tả riêng mốc CHECK. Bullet cho mốc mới nằm trong
-[báo cáo khoảng ngày](DATE_WINDOW_RESULTS.vi.md).
-
-```latex
-\resumeItemPlain{Evaluated a local Qwen3-4B LangGraph agent on 20 Vietnamese development questions over a 12-table synthetic SQLite database, achieving 75\% strict execution accuracy versus a 70\% single-pass baseline with schema CHECK constraints in context.}
-```
-
-Hoặc nhấn mạnh cải thiện context:
-
-```latex
-\resumeItemPlain{Added schema-derived CHECK constraints to model context, raising agent strict execution accuracy from 65\% to 75\% on a 20-question synthetic development evaluation at a fixed 4,096-token output budget.}
-```
-
-Nêu được 75% với phạm vi trên, không đổi nhãn nguồn dữ liệu/review thành human.

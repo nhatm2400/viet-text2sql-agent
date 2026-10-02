@@ -1,4 +1,4 @@
-# Review bằng AI — 30/09/2026
+# Review bằng AI - 30/09/2026
 
 Đã đọc yêu cầu và gold SQL của đủ **50 câu** (20 dev, 30 test), kiểm tra join, bộ lọc,
 định nghĩa tiền/thời gian, DISTINCT, thứ tự và trường hợp không có dữ liệu. Đã chạy
@@ -33,7 +33,7 @@ không chứng minh đúng trên mọi dữ liệu và **không phải accuracy 
    với dev, như payment totals, review, shipment. Có thể dùng như mốc nội bộ trên schema cố định,
    không gọi là đánh giá tổng quát sang query family hoặc database chưa thấy.
 4. **Câu hỏi đã chỉ rõ nhiều tên cột và quy tắc.** Điều này giúp gold ít mơ hồ nhưng dễ hơn
-   hội thoại nghiệp vụ tự nhiên. Chưa kiểm chứng clarification, ý định mơ hồ hoặc ngôn ngữ VI–EN.
+   hội thoại nghiệp vụ tự nhiên. Chưa kiểm chứng clarification, ý định mơ hồ hoặc ngôn ngữ VI-EN.
 5. Không thấy sai khác kết quả gold/Python trên snapshot này. Không đổi điểm model 60% đã đo,
    không chạy model trên test, không tự gắn reviewer là người dùng.
 

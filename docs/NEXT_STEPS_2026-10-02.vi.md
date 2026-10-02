@@ -17,9 +17,9 @@ mới hay sửa hash. Task tiếp theo là tối ưu trên development và đán
 cùng independent human sample audit khi có người review. Nội dung kế hoạch phía dưới là
 **lịch sử trước khi chốt 500**, không phải danh sách việc còn phải thực hiện hôm nay.
 
-**Cập nhật 02/10:** người dùng yêu cầu chạy tới khoảng 500 câu rồi dừng và đánh giá xem
-đã đủ để ghi CV chưa. Đã dừng ở đúng 500, worker thoát; replay xác nhận **61,0% strict**,
-**72,6% relaxed**, 15 database và 332 cặp database–SQL AST. Báo cáo/câu CV đã lưu tại
+**Cập nhật 02/10:** người dùng yêu cầu chạy tới khoảng 500 câu rồi dừng để
+chốt báo cáo kết quả. Đã dừng ở đúng 500, worker thoát; replay xác nhận **61,0% strict**,
+**72,6% relaxed**, 15 database và 332 cặp database-SQL AST. Báo cáo kết quả đã lưu tại
 [EVAL_500_RESULTS.vi.md](EVAL_500_RESULTS.vi.md). Không tự tiếp tục 1.118 câu còn lại.
 
 **Cập nhật 01/10:** runner đã kiểm chứng; agent đã tạm dừng ở **124/1.618 câu**, sau đó
@@ -39,7 +39,7 @@ của repo đang chạy; chưa khởi động lượt model trên adapted test s
 - Đã tích hợp downloader có version/hash, preflight nhiều database và runner checkpoint.
 - Package dev-v3: 898 câu hợp lệ / 25 database, từ 954 câu nguồn.
 - Package test-v2: 1.618 câu hợp lệ / 42 database, từ 1.908 câu nguồn;
-  1.004 cặp database–SQL AST khác nhau. Danh sách 290 câu loại trừ đã lưu riêng.
+  1.004 cặp database-SQL AST khác nhau. Danh sách 290 câu loại trừ đã lưu riêng.
 - Pilot cố định 4 câu dev / 4 database: baseline 2/4, agent 3/4. Các model misses đều
   hết output cap 4096 trước khi xuất SQL; không sửa prompt hoặc chọn lại mẫu sau kết quả.
 - Pilot hoàn tất tại `eval/results/20260930-180012-955024-vitext2sql-dev/`;
@@ -61,7 +61,7 @@ của repo đang chạy; chưa khởi động lượt model trên adapted test s
    cho pilot với hashes, source/eligible counts và exclusions; không đưa câu hỏi, SQL,
    database hay raw responses ViText2SQL vào Git. Lưu source/config cố định cho lượt lớn.
 3. **Khởi động agent trên đủ 1.618 câu adapted test hợp lệ.** Qwen3 4B local, output
-   cap 4096, cùng protocol đã chốt. Chạy agent trước để lấy metric cho CV; baseline
+   cap 4096, cùng protocol đã chốt. Chạy agent trước để đo execution accuracy; baseline
    trên tập lớn có thể là lượt so sánh riêng sau đó. Không sample câu dễ hoặc đổi cap
    giữa lượt. Theo pilot, agent có thể cần khoảng 25 giờ; đây chỉ là ước lượng từ 4 câu.
 4. **Theo dõi và báo cáo đúng trạng thái.** Ghi PID, đường dẫn run/log, checkpoint và

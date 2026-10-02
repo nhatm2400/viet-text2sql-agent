@@ -1,4 +1,4 @@
-# Phân tích 195 câu sai strict — 02/10/2026
+# Phân tích 195 câu sai strict - 02/10/2026
 
 Đã replay gold/prediction trên database đã pin và kiểm tra hashes của run 500.
 Không gọi model, không sửa prediction hoặc scorer. [Aggregate có hashes](evidence/vitext2sql-prefix-500-error-analysis-20261002.json).

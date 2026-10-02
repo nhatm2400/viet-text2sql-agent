@@ -1,4 +1,4 @@
-# Demo Qwen local + PostgreSQL thật — 02/10/2026
+# Demo Qwen local + PostgreSQL thật - 02/10/2026
 
 Đã nối provider `ollama_local` vào factory dùng chung của LangGraph, FastAPI và Streamlit.
 Không cần API key hay SDK nhà cung cấp. Profile demo riêng nằm trong

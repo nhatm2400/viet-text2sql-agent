@@ -1,4 +1,4 @@
-# Kết quả model local — 30/09/2026
+# Kết quả model local - 30/09/2026
 
 Đây là mốc 2048 token được giữ nguyên. Phép thử tiếp theo ở 4096 token đạt 65% trên cùng
 20 câu dev, kèm p95 khoảng gấp đôi; xem [bảng trước/sau](TOKEN_BUDGET_RESULTS.vi.md).
@@ -20,7 +20,7 @@ chiến lược, không phải ablation riêng của repair. Token gồm prompt 
 không tương đương chi phí tiền. Không tốn phí API; điện và phần cứng chưa được định lượng.
 
 20 câu là **10 query family × 2 miền**, AI-assisted, trên dữ liệu tổng hợp. Không phải
-20 ý định độc lập, không đo dữ liệu doanh nghiệp thực, PostgreSQL, RAG, VI–EN, hoặc UI đầy đủ.
+20 ý định độc lập, không đo dữ liệu doanh nghiệp thực, PostgreSQL, RAG, VI-EN, hoặc UI đầy đủ.
 Chỉ chạy một lượt mỗi câu/phương án; chưa đo độ biến thiên qua nhiều lần chạy.
 
 ## Phân tích lỗi
@@ -62,24 +62,6 @@ Trong lượt đầy đủ không đổi prompt, gold, model hay ngân sách the
 Cần khởi động runtime đã cài trước, xem [hướng dẫn](LIVE_LOCAL_EVAL.vi.md).
 Giữ đúng model digest và snapshot; không mặc định tag model hoặc seed đảm bảo kết quả
 bit-for-bit trên mọi runtime/phần cứng. Không cần tải lại model hay dùng API key.
-
-## Nội dung CV
-
-Nếu muốn nêu kết quả model, dùng câu có đủ phạm vi:
-
-```latex
-\resumeItemPlain{Evaluated a local Qwen3-4B LangGraph agent on 20 AI-authored Vietnamese development questions over a 12-table synthetic SQLite database, achieving 60\% strict execution accuracy; benchmarked against a single-pass baseline with the same 60\% result.}
-```
-
-Đây là kết quả thật nhưng còn thấp và bộ dev nhỏ. Với CV ngắn, có thể ưu tiên năng lực
-xây dựng phép đo thay vì dùng accuracy làm điểm nhấn:
-
-```latex
-\resumeItemPlain{Built and ran a reproducible local Text-to-SQL evaluation with 40 baseline/agent predictions, strict/relaxed execution scoring, latency and token tracking, and per-query failure traces.}
-```
-
-Giữ bullet mô tả agent trong [bản CV trước](LOCAL_EVAL_AND_CV.vi.md), chọn một trong hai
-bullet trên. Không ghi 100% từ kiểm chứng gold thành accuracy của model.
 
 ## Để có mốc đánh giá được con người kiểm tra
 

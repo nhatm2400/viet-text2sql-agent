@@ -1,4 +1,4 @@
-# ViText2SQL với Qwen3 4B local — 01/10/2026
+# ViText2SQL với Qwen3 4B local - 01/10/2026
 
 Đã tích hợp tải nguồn cố định, chuẩn bị database/gold và runner nhiều schema có checkpoint.
 Kết quả benchmark bên ngoài được giữ riêng với mốc 80% trên 20 câu nghiệp vụ synthetic.
@@ -11,7 +11,7 @@ bảng/cột và SQL tiếng Việt. [Paper](https://aclanthology.org/2020.findi
 mô tả quá trình dịch bởi người và split theo database. Repo không cung cấp file SQLite.
 [Spider chính thức](https://yale-lily.github.io/spider) cung cấp database và SQL gốc tiếng Anh.
 
-Để đo đúng thiết lập của dự án — câu hỏi tiếng Việt, schema tiếng Anh — pipeline ghép
+Để đo đúng thiết lập của dự án - câu hỏi tiếng Việt, schema tiếng Anh - pipeline ghép
 annotation ViText2SQL với Spider bằng cùng db_id và **AST SQL khớp hoàn toàn, gồm literal**.
 Đồng thời kiểm tra layout chỉ số bảng/cột, types, PK và FK của hai schema. Không bỏ qua
 giá trị khi ghép, không chèn giá trị gold vào SQL do model sinh, không đưa gold vào prompt.
@@ -103,7 +103,7 @@ checkpoint và cách tiếp tục có tại
 [ACTIVE_EVAL_2026-10-01.vi.md](ACTIVE_EVAL_2026-10-01.vi.md).
 
 **Cập nhật 02/10:** đã chạy thêm tới đúng 500 rồi dừng theo yêu cầu; replay xác nhận
-61,0% strict và 72,6% relaxed trên prefix 500 câu / 15 database. Phạm vi và câu CV:
+61,0% strict và 72,6% relaxed trên prefix 500 câu / 15 database. Phạm vi và kết quả:
 [EVAL_500_RESULTS.vi.md](EVAL_500_RESULTS.vi.md). Full run vẫn chưa hoàn tất.
 
 ## Chạy và tiếp tục checkpoint
@@ -152,10 +152,3 @@ resume chỉ chạy phần chưa ghi; các misses đã ghi giữ nguyên; không
 Báo cáo từ chối evidence thiếu predictions, scoring bị đổi, summary hoặc source snapshot sai.
 Báo cáo prefix yêu cầu đầy đủ predictions của các ID đầu tiên theo thứ tự nguồn;
 ghi riêng trạng thái subset đã hoàn tất và full run chưa hoàn tất, không tạo summary full giả.
-
-## Cách ghi CV sau lượt lớn
-
-Chỉ điền XX sau khi `summary.json` của lượt đầy đủ xuất hiện. Ví dụ với toàn bộ package test
-hiện tại: “Evaluated a local LangGraph Text-to-SQL agent on 1,618 adapted ViText2SQL questions
-across 42 SQLite databases, achieving XX% strict execution agreement.” Không gọi là official
-ViText2SQL accuracy hoặc human-reviewed adaptation khi chưa có chứng cứ tương ứng.

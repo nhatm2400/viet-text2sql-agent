@@ -1,4 +1,4 @@
-# Quy tắc khoảng ngày trên timestamp — 01/10/2026
+# Quy tắc khoảng ngày trên timestamp - 01/10/2026
 
 Đã chạy đủ 20 câu development × 2 phương án với output cap 4096 và CHECK constraints.
 **Baseline tăng từ 14/20 (70%) lên 16/20 (80%); agent từ 15/20 (75%) lên 16/20 (80%)**
@@ -104,18 +104,7 @@ Cụm “loại đơn cancelled” trong hai câu quantity có thể gây nhầm
 nếu làm rõ tiếng Việt, cần tạo phiên bản benchmark mới và đo riêng. Không thay câu hỏi
 giữa hai lượt rồi trình bày như cùng bộ dữ liệu.
 
-## Bullet CV có thể dùng
+## Bước tiếp theo
 
-```latex
-\resumeItemPlain{Evaluated a local Qwen3-4B LangGraph Text-to-SQL agent on 20 Vietnamese development questions over a 12-table synthetic SQLite database, achieving 80\% strict execution accuracy at a 4,096-token output budget.}
-```
-
-Hoặc tập trung vào thay đổi vừa đo:
-
-```latex
-\resumeItemPlain{Added shared timestamp-window guidance, raising strict execution accuracy from 75\% to 80\% for a local LangGraph agent and from 70\% to 80\% for a single-pass baseline on a fixed 20-question synthetic development set.}
-```
-
-Nêu được 80% với phạm vi development trên SQLite; không diễn giải thành kết quả human-reviewed
-hoặc PostgreSQL. Bước tiếp theo là làm rõ câu quantity trong một benchmark version riêng,
-sau đó đo riêng khả năng sinh SQL của nhóm danh mục mà không gộp hai thay đổi.
+Làm rõ câu quantity trong một phiên bản benchmark riêng, sau đó đo riêng khả năng sinh
+SQL của nhóm danh mục để phân biệt ảnh hưởng của từng thay đổi.

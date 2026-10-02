@@ -1,4 +1,4 @@
-# So sánh 2.048 và 4.096 token — 30/09/2026
+# So sánh 2.048 và 4.096 token - 30/09/2026
 
 Đây là mốc trước khi thêm CHECK constraints vào context. Phép thử tiếp theo đạt 70% baseline
 và 75% agent ở 4096 token; xem [kết quả context](SCHEMA_CHECK_RESULTS.vi.md).
@@ -90,17 +90,7 @@ schema context (schema_block ở mốc này chỉ liệt kê cột/type/FK), hư
 timestamp dạng [start,end), và kiểm tra SUM/DISTINCT/phủ định. Đây là đề xuất chưa được đo;
 không sửa prompt theo từng gold test. 30 câu test vẫn chưa được chạy.
 
-## Bullet CV cập nhật
-
-```latex
-\resumeItemPlain{Benchmarked a local Qwen3-4B LangGraph agent against single-pass SQL generation on 20 Vietnamese development questions over synthetic SQLite data; both achieved 65\% strict execution accuracy with a 4,096-token output budget.}
-```
-
-Nếu muốn nhấn mạnh công việc eval:
-
-```latex
-\resumeItemPlain{Evaluated two local Text-to-SQL strategies across 80 predictions on 20 development questions; increasing the output budget from 2,048 to 4,096 tokens raised strict execution accuracy from 60\% to 65\%, with p95 latency approximately doubling.}
-```
+## Phạm vi các lượt chạy
 
 80 dự đoán = 20 câu × 2 phương án × 2 cấu hình; không phải 80 câu độc lập. Pilot thêm
-8 dự đoán nằm ngoài 80. Các câu/gold được AI hỗ trợ tạo và review; không đổi nhãn thành human-reviewed.
+8 dự đoán nằm ngoài 80. Các câu/gold được AI hỗ trợ tạo và review; chưa có human review.

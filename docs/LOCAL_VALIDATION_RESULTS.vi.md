@@ -1,4 +1,4 @@
-# Kiểm chứng cục bộ và nội dung CV — 29/09/2026
+# Kiểm chứng cục bộ - 29/09/2026
 
 Đây là báo cáo mốc kiểm chứng không dùng LLM, giữ nguyên số liệu lịch sử.
 Mốc tiếp theo đã bổ sung seed v2, Ollama local và runner đo model thật;
@@ -39,7 +39,7 @@ Seed thứ hai có 50.153 dòng order_items; không áp dụng tuyên bố “d�
 
 30 ca mới là **10 dạng truy vấn × 3 miền**, không phải 30 ý định độc lập hay 60 câu hỏi.
 Câu hỏi, SQL và Python oracle đều được tạo với hỗ trợ AI trong phiên làm việc này;
-**chưa có người review độc lập**. Không ghi “human-verified benchmark” trên CV.
+**chưa có người review độc lập**. Trạng thái review vẫn pending.
 Đây là tập development với câu hỏi rõ định nghĩa, không phải test set giữ kín.
 
 ## 2. Đã xây và sửa gì
@@ -89,7 +89,7 @@ Repo chưa chứng minh tiếng Việt là nút thắt. Khó khăn có thể ki�
 KPI, schema và join: doanh thu theo payments.amount/paid_at khác tổng giá trị orders; COUNT dòng
 khác SUM số lượng; thiếu DISTINCT làm nhân số. Mutation suite cho thấy những lỗi này tạo đáp án
 khác dù SQL vẫn hợp lệ. Nó chưa cho biết LLM mắc những lỗi ấy bao nhiêu lần, hay tiếng Việt khó
-hơn tiếng Anh. Định vị nên là “truy vấn analytics bằng tiếng Việt có kiểm chứng”, rồi đo cặp VI–EN
+hơn tiếng Anh. Định vị nên là “truy vấn analytics bằng tiếng Việt có kiểm chứng”, rồi đo cặp VI-EN
 bằng cùng model/schema để xác định ảnh hưởng ngôn ngữ sau.
 
 **2. Dataset tự xây đại diện được bao nhiêu, nguồn ở đâu, có dùng LLM gen không?**
@@ -120,31 +120,12 @@ Milestone này chứng minh công cụ kiểm chứng được một số lỗi 
 
 **5. Giá trị kinh doanh đủ để triển khai và duy trì không?**
 
-Chưa biết. Giá trị portfolio đã rõ hơn: có loop, policy, bộ chấm, SQL execution thực và báo cáo
-có thể tái lập. Giá trị doanh nghiệp cần đo tỷ lệ câu hỏi trả đúng sau kiểm tra, thời gian xử lý
+Chưa biết. Prototype đã có loop, policy, bộ chấm, SQL execution thực và báo cáo có thể
+tái lập. Giá trị doanh nghiệp cần đo tỷ lệ câu hỏi trả đúng sau kiểm tra, thời gian xử lý
 bao gồm công review, tần suất nhu cầu, chi phí model và chi phí bảo trì schema/KPI. Chưa có số
-tiết kiệm thời gian, ROI, latency LLM hoặc chi phí trên truy vấn để đưa vào CV.
+tiết kiệm thời gian, ROI, latency LLM hoặc chi phí trên truy vấn.
 
-## 5. CV có thể dùng ngay
-
-Giữ `In Development`. Bản 3 bullet dưới đây giữ phần agent trung tâm và dùng các số đã chạy:
-
-```latex
-\resumeSubheading
-  {\href{https://github.com/nhatm2400/viet-text2sql-agent}{Viet-Text-to-SQL Agent -- Vietnamese Database Analytics}}{}
-  {AI Engineer}{In Development}
-  \resumeItemListStart
-    \resumeItemPlain{Built a LangGraph Text-to-SQL agent prototype for a 12-table PostgreSQL schema, with Vietnamese business-term lookup, SQL AST validation, and clarification handling.}
-    \resumeItemPlain{Built a 30-case SQL validation suite across 10 query families and two synthetic SQLite snapshots; all 60 gold-query checks matched Python reference calculations, and both execution scorers rejected all 60 deliberately incorrect query results.}
-    \resumeItemPlain{Validated SQL guardrails with 38 passing policy tests and 18 passing execution-wrapper tests, covering rejected inputs, permitted queries, LIMIT enforcement, and validation-bypass attempts.}
-  \resumeItemListEnd
-```
-
-Nếu chỉ đủ chỗ cho 2 bullet, giữ bullet agent và bullet 30-case; số 38/18 có thể để README.
-Không viết “achieved 100% Text-to-SQL accuracy”, “improved accuracy with RAG”,
-“human-verified benchmark”, “production-ready”, hoặc “PostgreSQL security verified” từ lần chạy này.
-
-## 6. Tái lập và bước tiếp theo
+## 5. Tái lập và bước tiếp theo
 
 Tại thư mục gốc repo:
 
@@ -161,5 +142,5 @@ Raw results vẫn git-ignored. Chưa commit/push thay đổi trong lần làm vi
 
 Thứ tự phát triển tiếp: sửa generator và version snapshot; con người review định nghĩa/gold;
 thiết kế test set theo query family giữ riêng; nối và test cấu hình baseline/ablation;
-chạy model thật khi có ngân sách; sau đó mới đo đóng góp retrieval/repair và VI–EN.
+chạy model thật khi có ngân sách; sau đó mới đo đóng góp retrieval/repair và VI-EN.
 Không cần mở rộng hạ tầng để có thêm những con số kiểm chứng cục bộ hiện tại.
